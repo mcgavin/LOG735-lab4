@@ -40,20 +40,24 @@ public class ServerThreadServeurFichier extends Thread{
 			
 			try { 
 				clientSocket = serverSocket.accept(); 
-				System.out.println("Connection réussi, port : " + clientSocket.getPort());
+				System.out.println("Connection entrante réussi, port : " + clientSocket.getPort());
 			} 
 			catch (IOException e) 
 		    { 
-				System.err.println("Connection échoué, port : " + clientSocket.getPort()); 
+				System.err.println("Connection entrante échoué, port : " + clientSocket.getPort()); 
 				System.exit(1); 
 		    } 
 			
-			
+			//pour une connection d<un serveur
 			TunnelServeurFichier tunnelServeurFichier = new TunnelServeurFichier(clientSocket,serveurLocal);
 			serveurLocal.addTunnelServeurFichierToList(tunnelServeurFichier);
 			
 			serveurLocal.printAllTunnel();
 
+			
+			// pour une connection d'un client
+			
+			
 		}
 	}
 }

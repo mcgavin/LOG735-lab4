@@ -1,9 +1,11 @@
 package serveurDeFichier;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +18,8 @@ public class ServeurFichier {
 	private ServerThreadServeurFichier serverThread;
 	private int ip;
 	private int port;
+	
+	private static ArrayList<File> listFichier;
 	
 	private static List<TunnelServeurFichier> listTunnelServeurFichier;
 	
@@ -52,52 +56,78 @@ public class ServeurFichier {
 		//pointEntreeIP = "127.0.0.1";
 		//pointEntreePort = 12045;
 		
+		
 		listTunnelServeurFichier = new ArrayList<TunnelServeurFichier>();
 		
 		//intervale random pour port entre 5000 et 10000
 		this.port = (int) (5000 + (Math.random()* (10000-5000)));
 
-		System.out.println("Mine Porte IST : "+ port);
+		System.out.println("Mon port est : "+ port);
 		
 		try {
 			Socket s = new Socket(pointEntreeIP, pointEntreePort);
-			
+
 			ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
 			ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
 
 			oos.writeObject("serveur:"+port);
 			
-			String listServeurFichierInfo = (String) ois.readObject();
 			
-			String[] serveurConnection = listServeurFichierInfo.split(";");
+			//recoit la liste des serveurs a se connecter
+			String listServeurFichierInfo;
+			try {
+				listServeurFichierInfo = (String) ois.readObject();
+				
+
+
 			
-			System.out.println(serveurConnection.length);
-			
-			if(listServeurFichierInfo.startsWith(";")){
-				for (String serveurFichierInfo : serveurConnection) {
+				//if not empty
+				if(listServeurFichierInfo.length() > 0){
 					
-					System.out.println("serveurFichierInfo=" + serveurFichierInfo);
+					//les serveurs sont separer par des "ip:port;ip:port"
+					String[] serveurConnection = listServeurFichierInfo.split(";");
 					
-					String[] serverInfo = serveurFichierInfo.split(":");
 					
-					if(serverInfo.length >1){
-						System.out.println(serverInfo[0]+ " : "+serverInfo[1]);
+					for (String serveurFichierInfo : serveurConnection) {
+						
+						System.out.println("connection a " + serveurFichierInfo);
+						
+						String[] serverInfo = serveurFichierInfo.split(":");
+						
+						try{
+							TunnelServeurFichier tunnel = new TunnelServeurFichier(
+									new Socket(serverInfo[0], Integer.parseInt(serverInfo[1])),this,"serveur");
+							listTunnelServeurFichier.add(tunnel);
+							
+						}catch(SocketException exception){
+							
+							System.err.println(serveurFichierInfo+ " est down, impossible de se connecter");
+							
+							//TODO
+							//notify PointEntree a host is down
+							//notify les autres serveur que le serveur en questin est down
+						}
+		
 					}
-					
-					TunnelServeurFichier tunnel = new TunnelServeurFichier(
-							new Socket(serverInfo[0], Integer.parseInt(serverInfo[1])),this);
-					listTunnelServeurFichier.add(tunnel);
-				} 
+				}
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 			printAllTunnel();
 			
 			//thread qui ecoute les connection entrante
-			serverThread = new ServerThreadServeurFichier(port, this);
+				serverThread = new ServerThreadServeurFichier(port, this);
+
 			serverThread.start();
 			
-		} catch (Exception e) {
+
+		}catch(SocketException e ){
+			System.err.println("pointEntree est down, check ip: "+pointEntreeIP+":"+pointEntreePort );
+			
+		}catch (IOException e) {
+			//impossible de creer une classe
 			e.printStackTrace();
-//			System.err.println("ERREUR serveurThreadINIT : \n"+ e.toString());
 		}
 	}
 	

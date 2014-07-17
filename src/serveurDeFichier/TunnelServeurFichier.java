@@ -6,7 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class TunnelServeurFichier extends Thread{
+public class TunnelServeurFichier {
 	
 	
 	private String ipLocal;
@@ -24,6 +24,7 @@ public class TunnelServeurFichier extends Thread{
 	private int succID;
 	private boolean record;
 	
+	//instancier a partire de 0
 	public TunnelServeurFichier(Socket clientSocket, ServeurFichier serveurFichierLocal){
 		
 		ipLocal = clientSocket.getLocalAddress().getHostAddress();
@@ -34,16 +35,55 @@ public class TunnelServeurFichier extends Thread{
 		this.serveurFichierLocal = serveurFichierLocal;
 
 		writeList = new syncedWriteList();
-		outputTread = new socketWriter(clientSocket,writeList );
-		inputTread = new socketListener(clientSocket,this );
-
+		
+		try {
+			ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
+			
+			outputTread = new socketWriter(clientSocket,writeList );
+			inputTread = new socketListener(clientSocket,this );
+			new Thread(outputTread).start();
+			new Thread(inputTread).start();
+			
+			
+		} catch (Exception e) {
+			System.err.println("failed to create Object or cast readObject");
+			e.printStackTrace();
+		}
 	}
 	
-	public void run(){
+	public TunnelServeurFichier(Socket clientSocket, ServeurFichier serveurFichierLocal, String type){
 		
-		new Thread(outputTread).start();
-		new Thread(inputTread).start();
+		ipLocal = clientSocket.getLocalAddress().getHostAddress();
+		portLocal = clientSocket.getLocalPort();
+		
+		ipDistant = clientSocket.getInetAddress().getHostAddress();
+		portDistant = clientSocket.getPort();
+		this.serveurFichierLocal = serveurFichierLocal;
+
+		writeList = new syncedWriteList();
+		
+		try {
+			ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
+			
+//			String type = (String) ois.readObject();
+			
+			if(type.equals("client")){
+			
+				outputTread = new socketWriter(clientSocket,writeList );
+				inputTread = new socketListener(ois,this );
+			}else if (type.equals("serveur")){
+			
+			}
+			new Thread(outputTread).start();
+			new Thread(inputTread).start();
+			
+			
+		} catch (Exception e) {
+			System.err.println("failed to create Object or cast readObject");
+			e.printStackTrace();
+		}
 	}
+	
 	
 	public String toString(){
 		
@@ -118,6 +158,12 @@ public class TunnelServeurFichier extends Thread{
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+		
+		public socketListener(ObjectInputStream objectInputStream,TunnelServeurFichier tunnel ){
+			
+				this.tunnel =  tunnel;
+				ois = objectInputStream;
 		}
 		
 		public void run() {

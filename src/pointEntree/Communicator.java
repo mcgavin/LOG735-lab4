@@ -60,11 +60,18 @@ public class Communicator extends Thread {
 				
 				//send all connection then add the new one
 				String out = "";
-				for (ServeurFichierInfo fichierInfo : this.pointEntree.getListSucc()) {
-					out+=fichierInfo+";";
+				
+				//if not empty
+				if (! ( this.pointEntree.getListSucc().isEmpty()) ){
+					for (ServeurFichierInfo fichierInfo : this.pointEntree.getListSucc()) {
+						out+=fichierInfo+";";
+					}
 				}
+				
 				System.out.println("la liste envoye est : "+out);
-				//send all conenction
+				
+				//send all connection
+				
 				oos.writeObject(out);
 				this.pointEntree.addServeurFichier(new ServeurFichierInfo(ipDistant, Integer.parseInt(typeConnectionsplit[1])));
 			} 
