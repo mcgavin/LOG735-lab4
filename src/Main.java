@@ -1,7 +1,9 @@
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.io.File;
+import java.util.Arrays;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -11,7 +13,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 
 
 public class Main {
@@ -38,17 +44,16 @@ public class Main {
 		listPanel.setLayout(new GridLayout(0, 1, 0, 0));
 		
 		
-		DefaultMutableTreeNode dmt = new DefaultMutableTreeNode();
-		MyFile f =  new MyFile("./Root Folder");
-		MyFile f2 =  new MyFile("./Root Folder/Folder3/Doc5.txt");
+		TreeModel model = new FileTreeModel(new File("./Root Folder"));
+		fileTree = new JTree(model);
 		
-		DefaultMutableTreeNode dmt2 = new DefaultMutableTreeNode();
-		dmt2.add(new DefaultMutableTreeNode(f2));
-		
-		dmt.add(new DefaultMutableTreeNode(f));
-		dmt.add(dmt2);
-		
-		fileTree = new JTree(dmt);
+		fileTree.addTreeSelectionListener(new TreeSelectionListener() {
+			public void valueChanged(TreeSelectionEvent e) {
+				File node = (File) e.getPath().getLastPathComponent();
+				System.out.println("You selected " + node);
+				//GestionBouton(node);
+			}
+		});
 		
 		JScrollPane scrollpane = new JScrollPane();
 		scrollpane.getViewport().add(fileTree);
@@ -96,5 +101,63 @@ public class Main {
 		}
 		
 	}
+	
+	private static class FileTreeModel implements TreeModel {
 
+	    private File root;
+
+	    public FileTreeModel(File root) {
+	        this.root = root;
+	    }
+
+	    @Override
+	    public void addTreeModelListener(javax.swing.event.TreeModelListener l) {
+	        //do nothing
+	    }
+
+	    @Override
+	    public Object getChild(Object parent, int index) {
+	        File f = (File) parent;
+	        return f.listFiles()[index];
+	    }
+
+	    @Override
+	    public int getChildCount(Object parent) {
+	        File f = (File) parent;
+	        if (!f.isDirectory()) {
+	            return 0;
+	        } else {
+	            return f.list().length;
+	        }
+	    }
+
+	    @Override
+	    public int getIndexOfChild(Object parent, Object child) {
+	        File par = (File) parent;
+	        File ch = (File) child;
+	        return Arrays.asList(par.listFiles()).indexOf(ch);
+	    }
+
+	    @Override
+	    public Object getRoot() {
+	        return root;
+	    }
+
+	    @Override
+	    public boolean isLeaf(Object node) {
+	        File f = (File) node;
+	        return !f.isDirectory();
+	    }
+
+	    @Override
+	    public void removeTreeModelListener(javax.swing.event.TreeModelListener l) {
+	        //do nothing
+	    }
+
+	    @Override
+	    public void valueForPathChanged(javax.swing.tree.TreePath path, Object newValue) {
+	        //do nothing
+	    }
+
+	}
 }
