@@ -10,7 +10,8 @@ public class PointEntree {
 
 	private ServerThreadPointEntree serverThread;
 	private ArrayList<ServeurFichierInfo> listServeurFichier;
-	private Iterator<ServeurFichierInfo> it;
+//	private Iterator<ServeurFichierInfo> it;
+	int it= Integer.MAX_VALUE;
 	
 	public static void main(String[] args) throws IOException {
 		
@@ -21,7 +22,7 @@ public class PointEntree {
 				port = Integer.parseInt(args[0]);
 			}
 		}catch (NumberFormatException e) {
-			System.err.println("port Invalide");
+			System.err.println("port Invalide, utilisation du port par default "+port);
 		}
 
 		System.out.println("**** Point d'Entree ****");
@@ -32,32 +33,44 @@ public class PointEntree {
 	
 	
 	public PointEntree(int port) throws IOException{
+		
+		CommandLineToolPointEntree cmd = new CommandLineToolPointEntree(this);
+		cmd.start();
+		
 		listServeurFichier = new ArrayList<ServeurFichierInfo>();
-		it = listServeurFichier.iterator() ;
-		
-		
+//		it = listServeurFichier.iterator() ;
+				
 		serverThread = new ServerThreadPointEntree(port, this);
 		serverThread.start();
 	}
 	
-	public void addServeurFichier(ServeurFichierInfo lienSucc) {
-		listServeurFichier.add(lienSucc);
+	public void addServeurFichier(ServeurFichierInfo serveurFichierInfo) {
+		listServeurFichier.add(serveurFichierInfo);
     }
 		
-	public ArrayList<ServeurFichierInfo> getListSucc(){
+	public ArrayList<ServeurFichierInfo> getListServeurFichierInfo(){
 		return listServeurFichier;
+	}
+	
+	public String printAllServers() {
+		String out= "";
+		for (ServeurFichierInfo serveurFichierInfo : listServeurFichier) {
+			out += " "+ serveurFichierInfo+"\n";
+		}
+		
+		return out;
+		
 	}
 	
 	public ServeurFichierInfo getIteratorNext(){
 		
-		ServeurFichierInfo info = null;
-		try {
-			info = it.next();
-		} catch (NoSuchElementException e) {
-			System.err.println("NoSuchElementException");
+		if ( it < listServeurFichier.size()){
+			it++;
+		}else{ 
+			it = 0;
 		}
 		
-		return info;
+		return listServeurFichier.get(it);
 	}
 	
 }

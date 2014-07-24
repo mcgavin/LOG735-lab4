@@ -1,15 +1,15 @@
-package serveurDeFichier;
+package pointEntree;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class CommandLineTool extends Thread {
+public class CommandLineToolPointEntree extends Thread {
 
-	private ServeurFichier serveurFichier;
+	private PointEntree pointEntree;
 	
-	public CommandLineTool(ServeurFichier serveurFichier){
-		this.serveurFichier = serveurFichier;
+	public CommandLineToolPointEntree(PointEntree pointEntree){
+		this.pointEntree = pointEntree;
 		
 	}
 	
@@ -38,11 +38,7 @@ public class CommandLineTool extends Thread {
 				
 				if(commandArg[0].equals("print")){
 					if(commandArg[1].equals("servers")){
-						serveurFichier.printServerList();
-						
-					}else if(commandArg[1].equals("clients")){
-						serveurFichier.printClientList();
-						
+						System.out.println(this.pointEntree.printAllServers());
 					}
 				}else if(commandArg[0].equals("erreur")){
 					

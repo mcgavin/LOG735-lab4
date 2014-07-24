@@ -49,7 +49,6 @@ public class ServerThreadPointEntree extends Thread{
 			Communicator communicator = new Communicator(clientSocket, pointEntree);
 			communicator.start();
 			
-			
 		}
 	}
 

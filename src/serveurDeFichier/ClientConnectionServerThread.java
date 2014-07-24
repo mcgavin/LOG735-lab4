@@ -7,7 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 
-public class ServerThreadServeurFichier extends Thread{
+public class ClientConnectionServerThread extends Thread{
 
 	private int listeningPort;
 	private ServerSocket serverSocket;
@@ -16,7 +16,7 @@ public class ServerThreadServeurFichier extends Thread{
 	private ServeurFichier serveurLocal;
 	
 
-	public ServerThreadServeurFichier (int listeningPort, ServeurFichier succursaleLocal) throws IOException
+	public ClientConnectionServerThread (int listeningPort, ServeurFichier succursaleLocal) throws IOException
 	{
 		this.listeningPort = listeningPort;
 		this.serveurLocal = succursaleLocal;
@@ -40,11 +40,11 @@ public class ServerThreadServeurFichier extends Thread{
 			
 			try { 
 				clientSocket = serverSocket.accept(); 
-				System.out.println("Connection entrante réussi, port : " + clientSocket.getPort());
+				System.out.println("Connection client entrante réussi, port : " + clientSocket.getPort());
 			} 
 			catch (IOException e) 
 		    { 
-				System.err.println("Connection entrante échoué, port : " + clientSocket.getPort()); 
+				System.err.println("Connection client entrante échoué, port : " + clientSocket.getPort()); 
 				System.exit(1); 
 		    } 
 			
@@ -52,7 +52,7 @@ public class ServerThreadServeurFichier extends Thread{
 			TunnelServeurFichier tunnelServeurFichier = new TunnelServeurFichier(clientSocket,serveurLocal);
 			serveurLocal.addTunnelServeurFichierToList(tunnelServeurFichier);
 			
-			serveurLocal.printAllTunnel();
+			serveurLocal.printClientList();
 
 			
 			// pour une connection d'un client

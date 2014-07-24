@@ -54,7 +54,8 @@ public class Communicator extends Thread {
 			
 			if(typeConnectionsplit[0].equals("client")){
 				//for load balancing
-				oos.writeObject(this.pointEntree.getIteratorNext());
+				System.out.println("Nouveau client ");
+				oos.writeObject(this.pointEntree.getIteratorNext().toStringClient());
 				
 			}else if (typeConnectionsplit[0].equals("serveur")) {
 				
@@ -62,9 +63,9 @@ public class Communicator extends Thread {
 				String out = "";
 				
 				//if not empty
-				if (! ( this.pointEntree.getListSucc().isEmpty()) ){
-					for (ServeurFichierInfo fichierInfo : this.pointEntree.getListSucc()) {
-						out+=fichierInfo+";";
+				if (! ( this.pointEntree.getListServeurFichierInfo().isEmpty()) ){
+					for (ServeurFichierInfo fichierInfo : this.pointEntree.getListServeurFichierInfo()) {
+						out+=fichierInfo.toStringServeur()+";";
 					}
 				}
 				
@@ -73,11 +74,19 @@ public class Communicator extends Thread {
 				//send all connection
 				
 				oos.writeObject(out);
-				this.pointEntree.addServeurFichier(new ServeurFichierInfo(ipDistant, Integer.parseInt(typeConnectionsplit[1])));
+				this.pointEntree.addServeurFichier(new ServeurFichierInfo(
+																	ipDistant,
+																	Integer.parseInt(typeConnectionsplit[1]),//port client
+																	Integer.parseInt(typeConnectionsplit[2]) //port serveur
+																	)
+													);
+				
+				
 			} 
 			
 						
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.err.println("Erreur "+e);
 		}
 	}

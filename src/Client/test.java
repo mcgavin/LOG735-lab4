@@ -1,3 +1,4 @@
+package Client;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -11,15 +12,15 @@ import java.awt.Component;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-
-import java.awt.FlowLayout;
-import java.awt.CardLayout;
-
-import net.miginfocom.swing.MigLayout;
+//
+//import com.jgoodies.forms.layout.FormLayout;
+//import com.jgoodies.forms.layout.ColumnSpec;
+//import com.jgoodies.forms.layout.RowSpec;
+//
+//import java.awt.FlowLayout;
+//import java.awt.CardLayout;
+//
+//import net.miginfocom.swing.MigLayout;
 
 import java.awt.GridLayout;
 import java.io.File;
