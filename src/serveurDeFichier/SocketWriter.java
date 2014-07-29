@@ -5,12 +5,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-class SocketWriter implements Runnable{
+class SocketWriter extends Thread{
 	
 	private ObjectOutputStream oos;
 	private SyncedWriteList stringToWrite;
+	private boolean running;
 	
 	public SocketWriter(Socket clientSocket, SyncedWriteList stringToWrite){
+		running = true;
 		try {
 			oos = new ObjectOutputStream(clientSocket.getOutputStream());
 			this.stringToWrite = stringToWrite;
@@ -22,7 +24,7 @@ class SocketWriter implements Runnable{
 	
 	public void run() {
 		//write whats in the list
-		while(true){
+		while(running){
 			
 			if (!stringToWrite.isEmpty()){
 				try {
@@ -33,5 +35,13 @@ class SocketWriter implements Runnable{
 				}
 			}
 		}
+	}
+
+	public boolean isRunning() {
+		return running;
+	}
+
+	public void setRunning(boolean running) {
+		this.running = running;
 	}
 }

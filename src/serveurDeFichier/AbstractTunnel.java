@@ -8,5 +8,5 @@ public class AbstractTunnel {
 		// TODO Auto-generated method stub
 		
 	}
-
+	public void close(){}
 }

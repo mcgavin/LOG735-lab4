@@ -43,8 +43,9 @@ public class TunnelClient extends AbstractTunnel{
 			
 			outputTread = new SocketWriter(clientSocket,writeList );
 			inputTread = new SocketListener(clientSocket,this );
-			new Thread(outputTread).start();
-			new Thread(inputTread).start();
+			inputTread.start();
+			outputTread.start();
+			
 			
 			
 		} catch (Exception e) {
@@ -64,7 +65,11 @@ public class TunnelClient extends AbstractTunnel{
 		this.serveurFichierLocal.addAndFillDataObject(dataObject);
 	}
 	
-	
+	public void closeTunnel(){
+		
+		inputTread.stop();
+		outputTread.stop();
+	}
 }
 
 	

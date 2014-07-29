@@ -60,12 +60,13 @@ public class ClientTest {
 			byte[] content = Files.readAllBytes(f.toPath());
 			oos.writeObject(content);
 			System.out.println("envoie reussi");
-			
-			ois.close();
+			System.out.println("close");
+			oos.writeObject("close");
+		/*	ois.close();
 			oos.flush();
 			oos.close();
 			
-			s.close();
+			s.close();*/
 			
 		} catch (IOException | ClassNotFoundException e ) {
 

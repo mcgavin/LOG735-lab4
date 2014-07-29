@@ -17,10 +17,11 @@ import Client.DataObject;
  * @author AJ60940
  *
  */
-class SocketListener implements Runnable{
+class SocketListener extends Thread{
 	
 	private ObjectInputStream ois;
 	private AbstractTunnel tunnel;
+	private boolean running;
 	Socket socket; 
 	
 	public SocketListener(Socket clientSocket,AbstractTunnel tunnel ){
@@ -28,7 +29,7 @@ class SocketListener implements Runnable{
 			this.tunnel =  tunnel;
 			this.socket = clientSocket;
 			ois = new ObjectInputStream(clientSocket.getInputStream());
-
+			running = true;
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -45,46 +46,57 @@ class SocketListener implements Runnable{
 	public void run() {
 		
 		//Ecoute et traite les evenements
-		while(true){
+		while(running){
 			try {
+				Object event = ois.readObject();
 				
-				String event = ois.readObject().toString();
+				//String event = ois.readObject().toString();
 				
-				if (event.startsWith("file")){
-					
-					//XXX delete ouput
-					System.out.println("Oh shit a file...");
-					
-					//expect partially filled dataObject ( name, owner, repo)
-					String xml = (String) ois.readObject();
-					
-					DataObject dataObject = xmlParser.xmlStringToObject(xml);
-					
-					//XXX delete ouput
-					System.out.println(dataObject);
-					
-					//create file 
-					File f = new File(dataObject.getName()) ;
-					
-					//get file from user
-					byte[] content = (byte[]) ois.readObject();
+				if(true){
+					String eventString  = ois.readObject().toString();
+					if (eventString.startsWith("file")){
+						
+						//XXX delete ouput
+						System.out.println("Oh shit a file...");
+						
+						//expect partially filled dataObject ( name, owner, repo)
+						String xml = (String) ois.readObject();
+						
+						DataObject dataObject = xmlParser.xmlStringToObject(xml);
+						
+						//XXX delete ouput
+						System.out.println(dataObject);
+						
+						//create file 
+						File f = new File(dataObject.getName()) ;
+						
+						//get file from user
+						byte[] content = (byte[]) ois.readObject();
 
-						Files.write(f.toPath(), content);
-					
+							Files.write(f.toPath(), content);
+						
 
 
-					
-					//XXX delete ouput
-					System.out.println("file transfered");
-					
-					
-					//fill dataObject
-					tunnel.addAndFillDataObject(dataObject);
-					
-					
-				}else if(event.startsWith("transfer:")){
+						
+						//XXX delete ouput
+						System.out.println("file transfered");
+						
+						
+						//fill dataObject
+						tunnel.addAndFillDataObject(dataObject);
+						
+						
+					}else if(eventString.startsWith("transfer:")){
+						
+					}else if(eventString.startsWith("close")){
+						System.out.println("close");
+						running = false;
+						tunnel.close();
+					}
 					
 				}
+				
+				
 				
 			} catch (IOException | ClassNotFoundException e) {	
 				
@@ -93,14 +105,22 @@ class SocketListener implements Runnable{
 				try {
 					
 					this.socket.close();
-					System.exit(1);
+					System.out.println("arf");
+					
 				} catch (IOException e1) {
-
+					System.out.println("arf22222");
 					e1.printStackTrace();
 				}
 			}
 
 		}
 		
+	}
+	public boolean isRunning() {
+		return running;
+	}
+
+	public void setRunning(boolean running) {
+		this.running = running;
 	}
 }
