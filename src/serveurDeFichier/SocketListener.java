@@ -100,11 +100,12 @@ class SocketListener extends Thread{
 				
 			} catch (IOException | ClassNotFoundException e) {	
 				
-				e.printStackTrace();
+				//e.printStackTrace();
 				
 				try {
 					
 					this.socket.close();
+					running = false;
 					System.out.println("arf");
 					
 				} catch (IOException e1) {

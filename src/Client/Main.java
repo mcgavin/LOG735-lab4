@@ -1,6 +1,7 @@
 package Client;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
@@ -29,6 +30,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import XMLtool.UpdateMetadata;
+import XMLtool.xmlParser;
 
 public class Main {
 
@@ -61,6 +63,7 @@ public class Main {
 	}
 
 	private void initialize() {
+		
 		frame = new JFrame();
 		frame.setResizable(false);
 		frame.setBounds(100, 100, 700, 500);
