@@ -42,31 +42,30 @@ public class CommandLineTool extends Thread {
 						
 					}else if(commandArg[1].equals("clients")){
 						serveurFichier.printClientList();
-						
+					}else{
+						printHelp();
 					}
+					
 				}else if(commandArg[0].equals("erreur")){
 					
 				}
 			
 			
 			}catch (Exception e) {
-				System.out.println("error trying to read your command!");
+				System.out.println("error trying to read your command!\n");
+				printHelp();
 			}
 		}
 	}
 	
 	public void printHelp(){
-		System.out.println("Commande de la Succursale\n" +
+		System.out.println("Commande du serveur de fichier : \n" +
 				"~~ COMMANDE ~~\n"+
-				"chandy                     : Demarre chandy-lamport\n"+
-				"envoie %succ% %montant%    : envoie le %montant% a la succursale %succ% (entier )\n" +
-				"erreur %montant%           : introduit un erreur en enlevant le montant a la succursale\n"+
-				"\n"+
+				"aradsf                       : Demarre chandy-lamport\n"+
 				"~~ INFORMATION ~~\n"+
-				"print help/aide            : print l'aide\n"+
-				"print ID/id                : print le Id de la succursale presente\n"+
-				"print montant/argent       : print l'argent succursale presente\n"+
-				"print list/tunnel          : print toute les connections vers les autres succursales\n" 
+				"print help                   : print l'aide\n"+
+				"print servers                : print la liste de serveurs\n"+
+				"print clients                : print la liste de client connecter\n"
 				);
 	}
 }

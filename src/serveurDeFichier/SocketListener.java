@@ -108,6 +108,7 @@ class SocketListener extends Thread{
 					System.out.println("arf");
 					running = false;
 					
+					
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
