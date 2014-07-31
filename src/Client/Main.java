@@ -61,8 +61,6 @@ public class Main {
 	}
 
 	private void initialize() {
-		DataObject dataobj = new DataObject(212,"asdasdas","125.0.01.2",51654,"aasdas","filesystem/somefolder/folder1/","Bob") ;
-		UpdateMetadata.ModifyFile(dataobj);
 		frame = new JFrame();
 		frame.setResizable(false);
 		frame.setBounds(100, 100, 700, 500);
