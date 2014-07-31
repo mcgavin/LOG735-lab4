@@ -53,9 +53,18 @@ public class Communicator extends Thread {
 			String[] typeConnectionsplit = typeConnection.split(":");
 			
 			if(typeConnectionsplit[0].equals("client")){
-				//for load balancing
-				System.out.println("Nouveau client ");
-				oos.writeObject(this.pointEntree.getIteratorNext().toStringClient());
+				
+				if (typeConnectionsplit.length>1){
+					System.out.println("Client declare seveur " + typeConnectionsplit[1] + ":" + typeConnectionsplit[2] + " est hors-service");
+					pointEntree.serverHS(typeConnectionsplit[1],typeConnectionsplit[2]);
+					System.out.println("Envoie des informations du serveur suivant");
+					oos.writeObject(this.pointEntree.getIteratorNext().toStringClient());
+				}else{
+					//for load balancing
+					System.out.println("Nouveau client ");
+					oos.writeObject(this.pointEntree.getIteratorNext().toStringClient());
+				}
+
 				
 			}else if (typeConnectionsplit[0].equals("serveur")) {
 				
@@ -80,11 +89,8 @@ public class Communicator extends Thread {
 																	Integer.parseInt(typeConnectionsplit[2]) //port serveur
 																	)
 													);
-				
-				
 			} 
-			
-						
+				
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println("Erreur "+e);

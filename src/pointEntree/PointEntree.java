@@ -31,7 +31,6 @@ public class PointEntree {
 		PointEntree pointEntree = new PointEntree(port);
 	}
 	
-	
 	public PointEntree(int port) throws IOException{
 		
 		CommandLineToolPointEntree cmd = new CommandLineToolPointEntree(this);
@@ -57,20 +56,35 @@ public class PointEntree {
 		for (ServeurFichierInfo serveurFichierInfo : listServeurFichier) {
 			out += " "+ serveurFichierInfo+"\n";
 		}
-		
-		return out;
-		
+		return out;	
 	}
 	
 	public ServeurFichierInfo getIteratorNext(){
-		
-		if ( it < listServeurFichier.size()){
-			it++;
-		}else{ 
-			it = 0;
-		}
-		
+			if ( it < listServeurFichier.size()-1){
+				it++;
+			}else{ 
+				it = 0;
+			}
+
 		return listServeurFichier.get(it);
 	}
 	
+	public void serverHS(String ipServer, String portClient){
+		
+		for(int i=0 ; i<listServeurFichier.size();i++){
+			if(ipServer.equals(listServeurFichier.get(i).getServeurIp()) && 
+					(Integer.parseInt(portClient)==listServeurFichier.get(i).getClientPort())){
+				
+				listServeurFichier.remove(i);
+				System.out.println("le serveur " + ipServer + ":" + portClient + " a ete enleve de la liste car HS");
+				if(it>0){
+					it = it - 1;
+				}else{
+					it = Integer.MAX_VALUE;
+				}
+				
+			}
+			
+		}
+	}
 }

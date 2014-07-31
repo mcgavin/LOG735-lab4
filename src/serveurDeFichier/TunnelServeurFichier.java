@@ -39,8 +39,8 @@ public class TunnelServeurFichier extends AbstractTunnel{
 		
 		outputTread = new SocketWriter(clientSocket,writeList );
 		inputTread = new SocketListener(clientSocket,this );
-		new Thread(outputTread).start();
-		new Thread(inputTread).start();
+		outputTread.start();
+		inputTread.start();
 			
 	}
 	
