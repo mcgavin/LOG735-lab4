@@ -1,20 +1,19 @@
 package Client;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
 
 @XmlRootElement(name = "file")
-@XmlType(propOrder = {"name", "server", "port", "absPath", "repo","owner","lastUpdated"})
+@XmlType(propOrder = {"name", "server", "port", "relName", "repo", "owner", "lastUpdated"})
 public class DataObject {
 	private int id;
 	private String name;
 	private String server;
 	private int port;
-	private String absPath;
+	private String relName;
 	private String repo;
 	private String owner;
 	private String lastUpdated;
@@ -23,12 +22,12 @@ public class DataObject {
 	
 	
 	
-	public DataObject(int id, String name, String server, int port, String absPath, String repo, String owner,String lastUpdated) {
+	public DataObject(int id, String name, String server, int port, String relName, String repo, String owner,String lastUpdated) {
 		this.id = id;
 		this.name = name;
 		this.server = server;
 		this.port = port;
-		this.absPath = absPath;
+		this.relName = relName;
 		this.repo = repo;
 		this.owner = owner;
 		this.lastUpdated = lastUpdated;
@@ -68,12 +67,12 @@ public class DataObject {
 		this.port = port;
 	}
 
-	public String getAbsPath() {
-		return absPath;
+	public String getRelName() {
+		return relName;
 	}
 
-	public void setAbsPath(String absPath) {
-		this.absPath = absPath;
+	public void setRelName(String relName) {
+		this.relName = relName;
 	}
 
 	public String getRepo() {

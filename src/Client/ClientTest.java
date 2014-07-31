@@ -55,7 +55,7 @@ public class ClientTest {
 			System.out.println("envoie d<un fichier");
 			oos.writeObject("file");
 			
-			DataObject dataOb =new DataObject(0,"Desert.jpg","0",0,"0","root/folder1/","Mathieu");
+			DataObject dataOb =new DataObject(0,"Desert.jpg","0",0,"0","root/folder1/","Mathieu", "23452");
 			
 			oos.writeObject(xmlParser.ObjectToXMLString(dataOb));
 			
@@ -100,7 +100,7 @@ public class ClientTest {
 			
 			
 			//create file 
-			DataObject dataObj = UpdateMetadata.getDataObjectFromFile(pathToFile);
+			//DataObject dataObj = UpdateMetadata.getDataObjectFromFile(pathToFile);
 			
 			
 			//get file from user
@@ -109,7 +109,7 @@ public class ClientTest {
 			
 			
 			//creer un DataObject par rapport au fichier a uploader
-			DataObject dataOb =new DataObject(0,"Desert.jpg","0",0,"0","root/folder1/","Mathieu");
+			DataObject dataOb =new DataObject(0,"Desert.jpg","0",0,"0","root/folder1/","Mathieu", "tete");
 			
 			oos.writeObject(xmlParser.ObjectToXMLString(dataOb));
 			

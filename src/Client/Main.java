@@ -5,9 +5,15 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -128,7 +134,7 @@ public class Main {
 		JScrollPane scrollpane = new JScrollPane();
 		scrollpane.getViewport().add(fileTree);
 		listPanel.add(BorderLayout.CENTER, scrollpane);
-
+		
 		JPanel btnPanel = new JPanel();
 		btnPanel.setBounds(10, 391, 674, 49);
 		frame.getContentPane().add(btnPanel);
@@ -145,6 +151,38 @@ public class Main {
 		btnUpload = new JButton("Upload");
 		btnUpload.setEnabled(false);
 		btnPanel.add(btnUpload);
+		btnUpload.addActionListener(new ActionListener() {
+			JFileChooser _fileChooser = new JFileChooser();
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+	            //... Open a file dialog.
+	            int retval = _fileChooser.showOpenDialog(frame);
+	            if (retval == JFileChooser.APPROVE_OPTION) {
+	                //... The user selected a file, get it, use it.
+	                File file = _fileChooser.getSelectedFile();
+	                
+	                String repoPath = fileTree.getSelectionPath().toString().replace("[Master Root","").replace("]", "").replace(", ", "/");
+
+	                //... Update user interface.
+	                //CLIENTTEST METHOD HERE XXX
+	                DataObject dataObject = new DataObject();
+	                dataObject.setName(file.getName());
+	                //dataObject.setServer(fileServerInfo[0]);
+	                //dataObject.setPort(fileServerInfo[1]);
+	                dataObject.setOwner("Client");
+	                DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+	                Date date = new Date();
+	                dataObject.setLastUpdated(dateFormat.format(date));
+	                dataObject.setRepo(repoPath);
+	                //Id et relname fabriquer par serveur
+	                //On envoit le dataobject a moitier construit au serveur
+	                String dataObjectToSend = xmlParser.ObjectToXMLString(dataObject);
+	                //Send dataObjectToSend et le file au serveur
+	                //somecode
+	                
+	            }
+	        }
+		});
 
 		btnDownload = new JButton("Download");
 		btnDownload.setEnabled(false);
@@ -207,11 +245,13 @@ public class Main {
 					data.setPort(Integer.parseInt(eElement
 							.getElementsByTagName("port").item(0)
 							.getTextContent()));
-					data.setAbsPath(eElement.getElementsByTagName("absPath")
+					data.setRelName(eElement.getElementsByTagName("relname")
 							.item(0).getTextContent());
 					data.setRepo(eElement.getElementsByTagName("repo").item(0)
 							.getTextContent());
 					data.setOwner(eElement.getElementsByTagName("owner")
+							.item(0).getTextContent());
+					data.setOwner(eElement.getElementsByTagName("lastupdated")
 							.item(0).getTextContent());
 					DefaultMutableTreeNode item = new DefaultMutableTreeNode(
 							data);
