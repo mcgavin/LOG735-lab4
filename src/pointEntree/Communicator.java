@@ -13,7 +13,7 @@ public class Communicator extends Thread {
 	private ObjectInputStream ois;
 	
 	private PointEntree pointEntree;
-	
+	private Socket clientSocket;
 	private int portDistant;
 	private String ipDistant;
 
@@ -22,6 +22,7 @@ public class Communicator extends Thread {
 		try {
 			
 			this.pointEntree = pointEntree;
+			this.clientSocket = clientSocket;
 			
 			ipDistant = clientSocket.getInetAddress().getHostAddress();
 			portDistant = clientSocket.getPort();
@@ -94,6 +95,13 @@ public class Communicator extends Thread {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println("Erreur "+e);
+		}
+		
+		try {
+			clientSocket.close();
+		} catch (IOException e) {
+			System.err.println("ERRROR: Cannot close Socket");
+			//e.printStackTrace();
 		}
 	}
 
