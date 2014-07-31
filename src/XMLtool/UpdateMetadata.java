@@ -178,7 +178,7 @@ public class UpdateMetadata {
 			sae.printStackTrace();
 		}
 	}
-	
+
 	public static void DeleteFile(DataObject dataObject) {
 		try {
 			String filepath = "metadata.xml";
