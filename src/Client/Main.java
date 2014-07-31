@@ -1,7 +1,6 @@
 package Client;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
@@ -35,7 +34,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import XMLtool.UpdateMetadata;
 import XMLtool.xmlParser;
 
 public class Main {
@@ -69,7 +67,6 @@ public class Main {
 	}
 
 	private void initialize() {
-		
 		frame = new JFrame();
 		frame.setResizable(false);
 		frame.setBounds(100, 100, 700, 500);
@@ -258,13 +255,13 @@ public class Main {
 					top.add(item);
 				}
 			} else {
-				DefaultMutableTreeNode item = new DefaultMutableTreeNode(
-						node.getNodeName());
 				for (int i = 0; i < node.getChildNodes().getLength(); i++) {
 					// not a file ? make it a repo in jTREE
+					DefaultMutableTreeNode item = new DefaultMutableTreeNode(
+							node.getNodeName());
 					parcourir(node.getChildNodes().item(i), item);
+					top.add(item);
 				}
-				top.add(item);
 			}
 		}
 		return top;
