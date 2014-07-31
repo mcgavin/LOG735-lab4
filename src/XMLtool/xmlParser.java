@@ -18,6 +18,48 @@ import Client.DataObject;
 
 public class xmlParser {
 	
+//	public static void main(String[] args) {
+//		 
+//		DataObject dataobj = new DataObject(212,"asdasdas","125.0.01.2",51654,"aasdas","jonh/root/","mathieu") ;
+//
+// 
+//		try {
+//			
+//			File file = new File("J:\\file.xml");
+//			JAXBContext jaxbContext = JAXBContext.newInstance(DataObject.class);
+//			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+//			 
+//			// output pretty printed
+//			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+//	 
+//			jaxbMarshaller.marshal(dataobj, file);
+//			jaxbMarshaller.marshal(dataobj, System.out);
+// 
+//			
+//			
+//		} catch (JAXBException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		try {
+//				 
+//			File file = new File("J:\\file.xml");
+//			JAXBContext jaxbContext = JAXBContext.newInstance(DataObject.class);
+//			 
+//			
+//			StringReader reader = new StringReader("xml string here");
+//			
+//			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+//			DataObject customer = (DataObject) jaxbUnmarshaller.unmarshal(reader);
+//			System.out.println(customer);
+//			
+//		} catch (JAXBException e) {
+//			e.printStackTrace();
+//		}
+// 
+//	}
+//	
+	
 	public static String ObjectToXMLString(DataObject fileObject){
 		DataObject dataObject = null;
 

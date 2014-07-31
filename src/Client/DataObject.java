@@ -3,12 +3,9 @@ package Client;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 
-
-@XmlRootElement(name = "file")
-@XmlType(propOrder = {"name", "server", "port", "absPath", "repo","owner","lastUpdated"})
+@XmlRootElement
 public class DataObject {
 	private int id;
 	private String name;
@@ -17,13 +14,12 @@ public class DataObject {
 	private String absPath;
 	private String repo;
 	private String owner;
-	private String lastUpdated;
 
 	public DataObject(){}
 	
 	
 	
-	public DataObject(int id, String name, String server, int port, String absPath, String repo, String owner,String lastUpdated) {
+	public DataObject(int id, String name, String server, int port, String absPath, String repo, String owner) {
 		this.id = id;
 		this.name = name;
 		this.server = server;
@@ -31,15 +27,29 @@ public class DataObject {
 		this.absPath = absPath;
 		this.repo = repo;
 		this.owner = owner;
-		this.lastUpdated = lastUpdated;
+	}
+
+	/**
+	 * Constructor from XML
+	 * 
+	 * @param xml as string
+	 */
+	public DataObject(String xml) {
+		
+		this.id = id;
+		this.name = name;
+		this.server = server;
+		this.port = port;
+		this.absPath = absPath;
+		this.repo = repo;
+		this.owner = owner;
 	}
 	
-	@XmlAttribute
 	public int getId() {
 		return id;
 	}
 	
-	
+	@XmlElement
 	public void setId(int id) {
 		this.id = id;
 	}
@@ -48,6 +58,7 @@ public class DataObject {
 		return name;
 	}
 
+	@XmlElement
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -56,6 +67,7 @@ public class DataObject {
 		return server;
 	}
 	
+	@XmlElement
 	public void setServer(String server) {
 		this.server = server;
 	}
@@ -64,6 +76,7 @@ public class DataObject {
 		return port;
 	}
 
+	@XmlElement
 	public void setPort(int port) {
 		this.port = port;
 	}
@@ -72,6 +85,7 @@ public class DataObject {
 		return absPath;
 	}
 
+	@XmlElement
 	public void setAbsPath(String absPath) {
 		this.absPath = absPath;
 	}
@@ -80,6 +94,7 @@ public class DataObject {
 		return repo;
 	}
 
+	@XmlElement
 	public void setRepo(String repo) {
 		this.repo = repo;
 	}
@@ -88,22 +103,29 @@ public class DataObject {
 		return owner;
 	}
 
+	@XmlElement
 	public void setOwner(String owner) {
 		this.owner = owner;
 	}
 	
-	public String getLastUpdated() {
-		return this.lastUpdated;
+	public String toXML(){
+		
+		String out = "";
+		
+		out+=	"<file id=\""+id+"\">"+
+					"<name>"+name+"</name>"+
+					"<server>"+server+"</server>"+
+					"<port>"+port+"</port>"+
+					"<absPath>"+absPath+"</absPath>"+
+					"<repo>"+repo+"</repo>"+
+					"<owner>"+owner+"</owner>"+
+				"</file>";
+		return out;		
 	}
-
-	public void setLastUpdated(String lastUpdated) {
-		this.lastUpdated = lastUpdated;
-	}
-	
 	
 	@Override
 	public String toString(){
-		return this.name + " (" + this.lastUpdated + ")";
+		return this.name;
 	}
 	
 }

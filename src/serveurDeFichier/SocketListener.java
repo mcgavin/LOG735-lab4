@@ -105,7 +105,6 @@ class SocketListener extends Thread{
 				try {
 					
 					this.socket.close();
-					running = false;
 					System.out.println("arf");
 					running = false;
 					
