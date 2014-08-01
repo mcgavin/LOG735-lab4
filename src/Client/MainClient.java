@@ -1,5 +1,6 @@
 package Client;
 
+import java.awt.EventQueue;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
@@ -11,11 +12,25 @@ import java.nio.file.Files;
 
 import XMLtool.xmlParser;
 
-public class ClientTest {
+public class MainClient {
 
 	public static void main(String[] args) {
 
-		new ClientTest();
+	//	new ClientTest();
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					
+					GUIWindow window = new GUIWindow(new MainClient());
+					
+					window.getFrame().setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		
+		
 	}
 
 	private ObjectOutputStream oos;
@@ -25,7 +40,11 @@ public class ClientTest {
 	private String[] fileServerInfo;
 	
 	
-	public ClientTest(){
+	public MainClient(){
+		
+
+		
+		
 		try {
 			//connection au point d'entrer
 			connection("127.0.0.1", 12045);
