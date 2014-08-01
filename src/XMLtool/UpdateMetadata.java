@@ -22,6 +22,43 @@ import org.xml.sax.SAXException;
 import Client.DataObject;
 
 public class UpdateMetadata {
+	public static void AddRepo(String repo, String name) {
+		try {
+			String filepath = "metadata.xml";
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory
+					.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse(filepath);
+
+			String[] repoPath = repo.split("/");
+			int nbSplits = repoPath.length;
+			Node nodeToPlaceNewRepo = null;
+			nodeToPlaceNewRepo = doc.getElementsByTagName(
+					repoPath[nbSplits - 1]).item(0);
+
+			Element repoToAdd = doc.createElement(name);
+			nodeToPlaceNewRepo.appendChild(repoToAdd);
+
+			TransformerFactory transformerFactory = TransformerFactory
+					.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(new File(filepath));
+			transformer.transform(source, result);
+
+			System.out.println("Adding Repo Done");
+
+		} catch (ParserConfigurationException pce) {
+			pce.printStackTrace();
+		} catch (TransformerException tfe) {
+			tfe.printStackTrace();
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		} catch (SAXException sae) {
+			sae.printStackTrace();
+		}
+	}
+
 	public static void AddNewFile(DataObject dataObject) {
 		try {
 
@@ -83,7 +120,8 @@ public class UpdateMetadata {
 
 			// owner elements
 			Element lastUpdated = doc.createElement("lastupdated");
-			lastUpdated.appendChild(doc.createTextNode(dataObject.getLastUpdated()));
+			lastUpdated.appendChild(doc.createTextNode(dataObject
+					.getLastUpdated()));
 			fileTodAdd.appendChild(lastUpdated);
 
 			// write the content into xml file
@@ -229,6 +267,49 @@ public class UpdateMetadata {
 			sae.printStackTrace();
 		} catch (NullPointerException e) {
 			System.err.println("File does not exist.");
+		}
+	}
+
+	public static void DeleteRepo(String repo) {
+		try {
+			String filepath = "metadata.xml";
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory
+					.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse(filepath);
+
+			// Find node to delete
+			// Pour simplifer, on fait getElement by name au lieu de faire une
+			// vrai recherche. PAS DE NOEUD AVEC NOM SIMILAIRE SINON CA MARCHE
+			// PAS !
+			String[] repoPath = repo.split("/");
+			int nbSplits = repoPath.length;
+			Node nodeToDelete = doc.getElementsByTagName(
+					repoPath[nbSplits - 1]).item(0);
+
+			Node parent = nodeToDelete.getParentNode();
+			parent.removeChild(nodeToDelete);
+
+			// write the content into xml file
+			TransformerFactory transformerFactory = TransformerFactory
+					.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(new File(filepath));
+			transformer.transform(source, result);
+
+			System.out.println("Delete Repo Done");
+
+		} catch (ParserConfigurationException pce) {
+			pce.printStackTrace();
+		} catch (TransformerException tfe) {
+			tfe.printStackTrace();
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		} catch (SAXException sae) {
+			sae.printStackTrace();
+		} catch (NullPointerException e) {
+			System.err.println("Repo does not exist.");
 		}
 	}
 }
