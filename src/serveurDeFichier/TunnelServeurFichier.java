@@ -49,15 +49,6 @@ public class TunnelServeurFichier extends AbstractTunnel{
 		return ""+ipLocal+":"+portLocal+" --> "+ipDistant+":"+portDistant;
 	}
 	
-	public void close(){
-		//inputTread.stop();
-		outputTread.stop();
-		serveurFichierLocal.removeTunnelServeurFichierFromList(this);
-	}
-	
-	public String getIpLocal(){
-		return ipLocal;
-	}
 	
 }
 

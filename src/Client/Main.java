@@ -258,9 +258,14 @@ public class Main {
 				DefaultMutableTreeNode item = new DefaultMutableTreeNode(
 						node.getNodeName());
 				for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+<<<<<<< HEAD
 					// not a file ? make it a repo in jTREE					
 					parcourir(node.getChildNodes().item(i), item);
 
+=======
+					// not a file ? make it a repo in jTREE
+					parcourir(node.getChildNodes().item(i), item);
+>>>>>>> parent of 99ef72b... syncrho des listes
 				}
 				top.add(item);
 			}

@@ -34,10 +34,6 @@ public class ServeurFichier {
 	
 	private int uniqueId = 0;
 	private String servID = "0";
-	
-	private Socket socket;
-	private ObjectOutputStream oos;
-	private ObjectInputStream ois;
 
 	
 	//***********************
@@ -53,7 +49,6 @@ public class ServeurFichier {
 	
 	public synchronized void removeTunnelServeurFichierFromList(TunnelServeurFichier tunnelServeurFichier) {
 		listTunnelServeurFichier.remove(tunnelServeurFichier);
-		System.out.println("Le serveur : "+tunnelServeurFichier.getIpLocal()+" est HS");
     }
 	
 	
@@ -119,10 +114,10 @@ public class ServeurFichier {
 		
 		
 		try {
-			socket = new Socket(pointEntreeIP, pointEntreePort);
+			Socket s = new Socket(pointEntreeIP, pointEntreePort);
 
-			oos = new ObjectOutputStream(socket.getOutputStream());
-			ois = new ObjectInputStream(socket.getInputStream());
+			ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
+			ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
 
 			
 			//authentification
@@ -140,14 +135,14 @@ public class ServeurFichier {
 			
 				//se connecte au autre serveur de fichier
 				connectionAuPair(listServeurFichierInfo);
-				System.out.println("bob");
+			
 				printServerList();
 				
 			} catch (ClassNotFoundException e) {
 					e.printStackTrace();
 			}
 	
-			socket.close();
+			s.close();
 			
 			
 			// SPAWN SERVER THREAD
@@ -200,13 +195,6 @@ public class ServeurFichier {
 				}catch(IOException exception){
 					
 					System.err.println(serveurFichierInfo+ " est down, impossible de se connecter");
-					try {
-						oos.writeObject("HS:"+serverInfo[0]+":"+serverInfo[1]);
-						System.out.println("gfr");
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
 					
 					//TODO
 					//notify PointEntree a host is down
