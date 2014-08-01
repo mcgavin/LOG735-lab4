@@ -296,10 +296,6 @@ public class Main {
 				for (int i = 0; i < node.getChildNodes().getLength(); i++) {
 					// not a file ? make it a repo in jTREE					
 					parcourir(node.getChildNodes().item(i), item);
-
-					// not a file ? make it a repo in jTREE
-					parcourir(node.getChildNodes().item(i), item);
-
 				}
 				top.add(item);
 			}
