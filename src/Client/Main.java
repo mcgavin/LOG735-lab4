@@ -1,13 +1,18 @@
 package Client;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -29,7 +34,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import XMLtool.UpdateMetadata;
 import XMLtool.xmlParser;
 
 public class Main {
@@ -63,7 +67,6 @@ public class Main {
 	}
 
 	private void initialize() {
-		
 		frame = new JFrame();
 		frame.setResizable(false);
 		frame.setBounds(100, 100, 700, 500);
@@ -128,7 +131,7 @@ public class Main {
 		JScrollPane scrollpane = new JScrollPane();
 		scrollpane.getViewport().add(fileTree);
 		listPanel.add(BorderLayout.CENTER, scrollpane);
-
+		
 		JPanel btnPanel = new JPanel();
 		btnPanel.setBounds(10, 391, 674, 49);
 		frame.getContentPane().add(btnPanel);
@@ -137,22 +140,90 @@ public class Main {
 		btnAddRepo = new JButton("Add repository");
 		btnAddRepo.setEnabled(false);
 		btnPanel.add(btnAddRepo);
+		btnAddRepo.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
 
 		btnDelRepo = new JButton("Delete Repository");
 		btnDelRepo.setEnabled(false);
 		btnPanel.add(btnDelRepo);
+		btnDelRepo.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
 
 		btnUpload = new JButton("Upload");
 		btnUpload.setEnabled(false);
 		btnPanel.add(btnUpload);
+		btnUpload.addActionListener(new ActionListener() {
+			JFileChooser _fileChooser = new JFileChooser();
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+	            //... Open a file dialog.
+	            int retval = _fileChooser.showOpenDialog(frame);
+	            if (retval == JFileChooser.APPROVE_OPTION) {
+	                //... The user selected a file, get it, use it.
+	                File file = _fileChooser.getSelectedFile();
+	                
+	                String repoPath = fileTree.getSelectionPath().toString().replace("[Master Root","").replace("]", "").replace(", ", "/");
+
+	                //... Update user interface.
+	                //CLIENTTEST METHOD HERE XXX
+	                DataObject dataObject = new DataObject();
+	                dataObject.setName(file.getName());
+	                //dataObject.setServer(fileServerInfo[0]);
+	                //dataObject.setPort(fileServerInfo[1]);
+	                dataObject.setOwner("Client");
+	                DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+	                Date date = new Date();
+	                dataObject.setLastUpdated(dateFormat.format(date));
+	                dataObject.setRepo(repoPath);
+	                //Id et relname fabriquer par serveur
+	                //On envoit le dataobject a moitier construit au serveur
+	                String dataObjectToSend = xmlParser.ObjectToXMLString(dataObject);
+	                //Send dataObjectToSend et le file au serveur
+	                //somecode
+	                
+	            }
+	        }
+		});
 
 		btnDownload = new JButton("Download");
 		btnDownload.setEnabled(false);
 		btnPanel.add(btnDownload);
+		btnDownload.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
 
 		btnDelete = new JButton("Delete");
 		btnDelete.setEnabled(false);
 		btnPanel.add(btnDelete);
+		btnDelete.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
 
 		JMenuBar menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
@@ -207,11 +278,13 @@ public class Main {
 					data.setPort(Integer.parseInt(eElement
 							.getElementsByTagName("port").item(0)
 							.getTextContent()));
-					data.setAbsPath(eElement.getElementsByTagName("absPath")
+					data.setRelName(eElement.getElementsByTagName("relname")
 							.item(0).getTextContent());
 					data.setRepo(eElement.getElementsByTagName("repo").item(0)
 							.getTextContent());
 					data.setOwner(eElement.getElementsByTagName("owner")
+							.item(0).getTextContent());
+					data.setOwner(eElement.getElementsByTagName("lastupdated")
 							.item(0).getTextContent());
 					DefaultMutableTreeNode item = new DefaultMutableTreeNode(
 							data);
@@ -221,7 +294,7 @@ public class Main {
 				DefaultMutableTreeNode item = new DefaultMutableTreeNode(
 						node.getNodeName());
 				for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-					// not a file ? make it a repo in jTREE
+					// not a file ? make it a repo in jTREE					
 					parcourir(node.getChildNodes().item(i), item);
 				}
 				top.add(item);

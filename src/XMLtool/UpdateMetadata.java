@@ -66,9 +66,9 @@ public class UpdateMetadata {
 					.getPort()))));
 			fileTodAdd.appendChild(port);
 
-			// absPath elements
-			Element absPath = doc.createElement("absPath");
-			absPath.appendChild(doc.createTextNode(dataObject.getAbsPath()));
+			// relName elements
+			Element absPath = doc.createElement("relname");
+			absPath.appendChild(doc.createTextNode(dataObject.getRelName()));
 			fileTodAdd.appendChild(absPath);
 
 			// repo elements
@@ -80,6 +80,11 @@ public class UpdateMetadata {
 			Element owner = doc.createElement("owner");
 			owner.appendChild(doc.createTextNode(dataObject.getOwner()));
 			fileTodAdd.appendChild(owner);
+
+			// owner elements
+			Element lastUpdated = doc.createElement("lastupdated");
+			lastUpdated.appendChild(doc.createTextNode(dataObject.getLastUpdated()));
+			fileTodAdd.appendChild(lastUpdated);
 
 			// write the content into xml file
 			TransformerFactory transformerFactory = TransformerFactory
@@ -102,6 +107,7 @@ public class UpdateMetadata {
 		}
 	}
 
+	@Deprecated
 	public static void ModifyFile(DataObject dataObject) {
 		try {
 			String filepath = "metadata.xml";
@@ -143,8 +149,8 @@ public class UpdateMetadata {
 				}
 
 				// update absPath value
-				if ("absPath".equals(node.getNodeName())) {
-					node.setTextContent(dataObject.getAbsPath());
+				if ("relname".equals(node.getNodeName())) {
+					node.setTextContent(dataObject.getRelName());
 				}
 
 				// update repo value
@@ -199,7 +205,7 @@ public class UpdateMetadata {
 					file = fileList.item(i);
 				}
 			}
-			
+
 			Node parent = file.getParentNode();
 			parent.removeChild(file);
 
@@ -221,7 +227,7 @@ public class UpdateMetadata {
 			ioe.printStackTrace();
 		} catch (SAXException sae) {
 			sae.printStackTrace();
-		} catch (NullPointerException e){
+		} catch (NullPointerException e) {
 			System.err.println("File does not exist.");
 		}
 	}

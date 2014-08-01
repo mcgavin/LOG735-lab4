@@ -105,11 +105,11 @@ class SocketListener extends Thread{
 				try {
 					
 					this.socket.close();
-					running = false;
 					System.out.println("arf");
+					running = false;
+					
 					
 				} catch (IOException e1) {
-					System.out.println("arf22222");
 					e1.printStackTrace();
 				}
 			}

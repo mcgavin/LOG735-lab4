@@ -47,9 +47,13 @@ public class ServeurFichier {
 		listTunnelServeurFichier.add(tunnelServeurFichier);
     }
 	
+	public synchronized void removeTunnelServeurFichierFromList(TunnelServeurFichier tunnelServeurFichier) {
+		listTunnelServeurFichier.remove(tunnelServeurFichier);
+    }
+	
 	
 	//***********************
-	// MAiN
+	// MAIN
 	
 	public static void main(String[] args) throws IOException {
 		System.out.println("**** Serveur de Fichier ****");
@@ -71,8 +75,7 @@ public class ServeurFichier {
 	
 	
 	/**
-	 * Contructeur 
-	 * 
+	 * Constructeur 
 	 * 
 	 * @param pointEntreeIP   : ip du point d<entrer du systeme de fichier
 	 * @param pointEntreePort : port de connectino du point d<entrer du systeme de fichier
@@ -164,7 +167,7 @@ public class ServeurFichier {
 	
 	
 	/**
-	 * Se Connecter au autres serveur de fichier selon le string qui represente une liste d<adresse serveur
+	 * Se Connecter au autres serveur de fichier selon le string qui represente une liste d'adresse serveur
 	 * 
 	 * @param listServeurFichierInfo
 	 */
@@ -200,7 +203,7 @@ public class ServeurFichier {
 
 			}
 		}else{
-			System.out.println("Aucun autre serveur connecter au systeme");
+			System.err.println("Aucun autre serveur connecter au systeme");
 		}
 	}
 	
@@ -247,7 +250,9 @@ public class ServeurFichier {
 	 */
 	public String printServerList(){
 		
-		String output = "***********************************\n**  Liste de Serveur de fichier  ** \n***********************************";
+		String output = "***********************************\n"+
+						"**  Liste de Serveur de fichier  **\n"+
+						"***********************************";
 		for (TunnelServeurFichier tunnel : listTunnelServeurFichier) {
 			output += "\n"+tunnel;
 		}
@@ -263,7 +268,9 @@ public class ServeurFichier {
 	 */
 	public String printClientList(){
 		
-		String output = "*********************************\n**  Liste de Client  ** \n*********************************\n";
+		String output = "*********************************\n"+
+						"*******  Liste de Client  *******\n"+
+						"*********************************\n";
 		for (TunnelClient tunnel : listTunnelClient) {
 			output += " me -> "+tunnel+"\n";
 		}
