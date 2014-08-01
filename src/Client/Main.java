@@ -140,10 +140,28 @@ public class Main {
 		btnAddRepo = new JButton("Add repository");
 		btnAddRepo.setEnabled(false);
 		btnPanel.add(btnAddRepo);
+		btnAddRepo.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
 
 		btnDelRepo = new JButton("Delete Repository");
 		btnDelRepo.setEnabled(false);
 		btnPanel.add(btnDelRepo);
+		btnDelRepo.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
 
 		btnUpload = new JButton("Upload");
 		btnUpload.setEnabled(false);
@@ -184,10 +202,28 @@ public class Main {
 		btnDownload = new JButton("Download");
 		btnDownload.setEnabled(false);
 		btnPanel.add(btnDownload);
+		btnDownload.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
 
 		btnDelete = new JButton("Delete");
 		btnDelete.setEnabled(false);
 		btnPanel.add(btnDelete);
+		btnDelete.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
 
 		JMenuBar menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
