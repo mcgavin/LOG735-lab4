@@ -36,7 +36,7 @@ import org.w3c.dom.Node;
 
 import XMLtool.xmlParser;
 
-public class Main {
+public class GUIWindow {
 
 	private JFrame frame;
 	private JButton btnAddRepo;
@@ -45,15 +45,18 @@ public class Main {
 	private JButton btnDownload;
 	private JButton btnDelete;
 	private JTree fileTree;
+	
+	private MainClient mainClient;
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Main window = new Main();
+					GUIWindow window = new GUIWindow();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -62,7 +65,17 @@ public class Main {
 		});
 	}
 
-	public Main() {
+	/**
+	 * remain compatible to main statis method
+	 */
+	@Deprecated
+	public GUIWindow() {
+		this.mainClient = mainClient;
+		initialize();
+	}
+	
+	public GUIWindow(MainClient mainClient) {
+		this.mainClient = mainClient;
 		initialize();
 	}
 
@@ -120,7 +133,6 @@ public class Main {
 
 			@Override
 			public void treeExpanded(TreeExpansionEvent arg0) {
-				// TODO Auto-generated method stub
 				arg0.getPath();
 				arg0.getSource();
 			}
@@ -179,7 +191,7 @@ public class Main {
 	                String repoPath = fileTree.getSelectionPath().toString().replace("[Master Root","").replace("]", "").replace(", ", "/");
 
 	                //... Update user interface.
-	                //CLIENTTEST METHOD HERE XXX
+
 	                DataObject dataObject = new DataObject();
 	                dataObject.setName(file.getName());
 	                //dataObject.setServer(fileServerInfo[0]);
@@ -193,7 +205,7 @@ public class Main {
 	                //On envoit le dataobject a moitier construit au serveur
 	                String dataObjectToSend = xmlParser.ObjectToXMLString(dataObject);
 	                //Send dataObjectToSend et le file au serveur
-	                //somecode
+	                mainClient.sendFile(dataObject, file);
 	                
 	            }
 	        }
@@ -235,6 +247,8 @@ public class Main {
 		mnFile.add(mntmExit);
 	}
 
+	
+	
 	private DefaultMutableTreeNode LoadAllXmlIntoTree() {
 		DefaultMutableTreeNode top = null;
 		DefaultMutableTreeNode completedTree = null;
@@ -339,4 +353,10 @@ public class Main {
 			btnUpload.setEnabled(true);
 		}
 	}
+	
+	public JFrame getFrame(){
+		
+		return this.frame;
+	}
+	
 }
