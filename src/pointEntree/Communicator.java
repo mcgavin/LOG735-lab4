@@ -89,7 +89,9 @@ public class Communicator extends Thread {
 																	Integer.parseInt(typeConnectionsplit[2]) //port serveur
 																	)
 													);
-			} 
+			}else if(typeConnectionsplit[0].equals("HS")){
+				pointEntree.serverHS(typeConnectionsplit[1], typeConnectionsplit[2]);
+			}
 				
 		} catch (Exception e) {
 			e.printStackTrace();

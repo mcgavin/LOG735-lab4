@@ -65,10 +65,9 @@ public class TunnelClient extends AbstractTunnel{
 		this.serveurFichierLocal.addAndFillDataObject(dataObject);
 	}
 	
-	public void closeTunnel(){
-		
+	public void close(){
 		inputTread.stop();
-		outputTread.stop();
+		//outputTread.stop();
 	}
 }
 

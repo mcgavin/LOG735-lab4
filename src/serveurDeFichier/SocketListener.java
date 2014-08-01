@@ -105,8 +105,9 @@ class SocketListener extends Thread{
 				try {
 					
 					this.socket.close();
-					System.out.println("arf");
+					tunnel.close();
 					running = false;
+					
 					
 					
 				} catch (IOException e1) {
