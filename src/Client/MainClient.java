@@ -10,6 +10,10 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 
+import javax.sound.sampled.Port;
+
+import com.sun.java.swing.plaf.windows.resources.windows;
+
 import XMLtool.xmlParser;
 
 public class MainClient {
@@ -21,7 +25,9 @@ public class MainClient {
 			public void run() {
 				try {
 					
-					GUIWindow window = new GUIWindow(new MainClient());
+					ModelDAO xmlHandler = new ModelDAO();
+					GUIWindow window = new GUIWindow(xmlHandler);
+					MainClient mainclient = new MainClient(xmlHandler,window );
 					
 					window.getFrame().setVisible(true);
 				} catch (Exception e) {
@@ -39,11 +45,13 @@ public class MainClient {
 	private String infoServer;
 	private String[] fileServerInfo;
 	
+	ModelDAO xmlHandler;
+	TunnelClientServeurFichier tunnelServeurFichier;
 	
-	public MainClient(){
-		
-
-		
+	public MainClient(ModelDAO xmlHandler,GUIWindow window){
+				
+		window.addController(this);
+		this.xmlHandler = xmlHandler;
 		
 		try {
 			//connection au point d'entrer
@@ -63,22 +71,27 @@ public class MainClient {
 		
 	}
 
-
-
 	public void instruction(){
 		
-		System.out.println("lancement des instructions");
+		System.out.println("Connection au serveur de fichier");
 		
 		try{
 			
 			this.fileServerInfo = infoServer.split(":");
-			socket = new Socket(fileServerInfo[0],Integer.parseInt(fileServerInfo[1]));
 			
 			System.out.println("connection au serveur "+ infoServer);
-			oos = new ObjectOutputStream(socket.getOutputStream());
-			ois = new ObjectInputStream(socket.getInputStream());
-			
+			socket = new Socket(fileServerInfo[0],Integer.parseInt(fileServerInfo[1]));
 			System.out.println("connection reussis");
+			
+			tunnelServeurFichier = new TunnelClientServeurFichier(socket, this);
+			
+			
+//			oos = new ObjectOutputStream(socket.getOutputStream());
+//			ois = new ObjectInputStream(socket.getInputStream());
+			
+			
+			
+			
 			
 //			System.out.println("envoie d<un fichier");
 //			oos.writeObject("file");
@@ -123,8 +136,7 @@ public class MainClient {
 		socket = new Socket(pointEntrerIP, port);
 		
 		System.out.print(" ok\n");
-		
-		
+			
 		oos = new ObjectOutputStream(socket.getOutputStream());
 		ois = new ObjectInputStream(socket.getInputStream());
 		
@@ -136,8 +148,6 @@ public class MainClient {
 		
 		//fermeture de la connection avec le point d'entrer
 		socket.close();
-
-		
 	}
 	
 	public void reConnection() throws UnknownHostException, IOException, ClassNotFoundException{
@@ -167,11 +177,13 @@ public class MainClient {
 	 */
 	public void sendFile(DataObject dataObj, File fileToSend){
 		
-		try {
+		
 			System.out.println("envoie d'un fichier");
 		
+			
+			tunnelServeurFichier.sendFile( dataObj, fileToSend);
 			//alert server that a file is comming
-			oos.writeObject("file");
+//			oos.writeObject("file");
 		
 			///XXX DUMMY dataObject and file
 			//DataObject dataOb =new DataObject(0,"Desert.jpg","0",0,"0","root/folder1/","Mathieu","");
@@ -179,23 +191,39 @@ public class MainClient {
 			
 			
 			//serialise and send dataObject( object that represent the file ) 
-			oos.writeObject(xmlParser.ObjectToXMLString(dataObj));
+//			oos.writeObject(xmlParser.ObjectToXMLString(dataObj));
 			
 			//get the file Byte
-			byte[] content = Files.readAllBytes(fileToSend.toPath());
+//			byte[] content = Files.readAllBytes(fileToSend.toPath());
 			
 			//send the file
-			oos.writeObject(content);
-			System.out.println("envoie reussi");
+//			oos.writeObject(content);
+//			System.out.println("envoie reussi");
 			
 			//say close to server
-			System.out.println("close");
-			oos.writeObject("close");
+//			System.out.println("close");
+//			oos.writeObject("close");
+			
+
+	}
+	
+
+	
+	public void downloadFile(DataObject dataObj){
+		
+		Socket s;
+		try {
+			
+			s = new Socket(dataObj.getServer(), dataObj.getPort());
+			new TunnelDownloadFichier(s, dataObj);
+			
 			
 		} catch (IOException e) {
-			System.err.println("File transfer gone wrong file not uploaded");
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		
 	}
 	
 }

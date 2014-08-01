@@ -3,6 +3,7 @@ package Client;
 import java.io.File;
 import java.io.IOException;
 
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -257,5 +258,74 @@ public class ModelDAO {
 		} catch (NullPointerException e) {
 			System.err.println("File does not exist.");
 		}
+	}
+	
+	
+	public DefaultMutableTreeNode loadAllXmlIntoTree() {
+		DefaultMutableTreeNode top = null;
+		DefaultMutableTreeNode completedTree = null;
+		try {
+
+//			File fXmlFile = new File("metadata.xml");
+//			DocumentBuilderFactory dbFactory = DocumentBuilderFactory
+//					.newInstance();
+//			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+//			Document doc = dBuilder.parse(fXmlFile);
+
+			doc.getDocumentElement().normalize();
+
+			System.out.println("Root element :"
+					+ doc.getDocumentElement().getNodeName());
+
+			top = new DefaultMutableTreeNode(doc.getFirstChild().getNodeName());
+			DefaultMutableTreeNode start = new DefaultMutableTreeNode(
+					"Master Root");
+			completedTree = parcourir(doc.getFirstChild(), start);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return completedTree;
+	}
+
+	public DefaultMutableTreeNode parcourir(Node node,
+			DefaultMutableTreeNode top) {
+		if (node != null) {
+			if (node.getNodeName().equals("file")) {
+				// do something with file
+				if (node.getNodeType() == Node.ELEMENT_NODE) {
+
+					Element eElement = (Element) node;
+					DataObject data = new DataObject();
+					data.setId(Integer.parseInt(eElement.getAttribute("id")));
+					data.setName(eElement.getElementsByTagName("name").item(0)
+							.getTextContent());
+					data.setServer(eElement.getElementsByTagName("server")
+							.item(0).getTextContent());
+					data.setPort(Integer.parseInt(eElement
+							.getElementsByTagName("port").item(0)
+							.getTextContent()));
+					data.setRelName(eElement.getElementsByTagName("relname")
+							.item(0).getTextContent());
+					data.setRepo(eElement.getElementsByTagName("repo").item(0)
+							.getTextContent());
+					data.setOwner(eElement.getElementsByTagName("owner")
+							.item(0).getTextContent());
+					data.setOwner(eElement.getElementsByTagName("lastupdated")
+							.item(0).getTextContent());
+					DefaultMutableTreeNode item = new DefaultMutableTreeNode(
+							data);
+					top.add(item);
+				}
+			} else {
+				DefaultMutableTreeNode item = new DefaultMutableTreeNode(
+						node.getNodeName());
+				for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+					// not a file ? make it a repo in jTREE					
+					parcourir(node.getChildNodes().item(i), item);
+				}
+				top.add(item);
+			}
+		}
+		return top;
 	}
 }

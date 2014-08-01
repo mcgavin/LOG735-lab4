@@ -1,4 +1,4 @@
-package serveurDeFichier;
+package Client;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,14 +17,14 @@ import Client.DataObject;
  * @author AJ60940
  *
  */
-class SocketListener extends Thread{
+class ClientSocketListener extends Thread{
 	
 	private ObjectInputStream ois;
-	private AbstractTunnel tunnel;
+	private TunnelClientServeurFichier tunnel;
 	private boolean running;
 	Socket socket; 
 	
-	public SocketListener(Socket clientSocket,AbstractTunnel tunnel ){
+	public ClientSocketListener(Socket clientSocket,TunnelClientServeurFichier tunnel ){
 		try {
 			this.tunnel =  tunnel;
 			this.socket = clientSocket;
@@ -48,55 +48,30 @@ class SocketListener extends Thread{
 		//Ecoute et traite les evenements
 		while(running){
 			try {
-				Object event = ois.readObject();
 				
-				//String event = ois.readObject().toString();
-				
-				if(true){
-					String eventString  = ois.readObject().toString();
+				String eventString  = ois.readObject().toString();
+				if (eventString.startsWith("file")){
 					
+					//create file 
+					File f = new File("temp") ;
 					
-					if (eventString.startsWith("file")){
-						
-						//XXX delete ouput
-						System.out.println("Oh shit a file...");
-						
-						//expect partially filled dataObject ( name, owner, repo)
-						String xml = (String) ois.readObject();
-						
-						DataObject dataObject = xmlParser.xmlStringToObject(xml);
-						
-						//XXX delete ouput
-						System.out.println(dataObject);
-						
-						//create file 
-						File f = new File(dataObject.getName()) ;
-						
-						//get file from user
-						byte[] content = (byte[]) ois.readObject();
+					//get file from user
+					byte[] content = (byte[]) ois.readObject();
 
-							Files.write(f.toPath(), content);
-						
+					Files.write(f.toPath(), content);
+					
 
 
-						
-						//XXX delete ouput
-						System.out.println("file transfered");
-						
-						
-						//fill dataObject
-						tunnel.addAndFillDataObject(dataObject);
-						
-						
-					}else if(eventString.startsWith("transfer:")){
-						
-					}else if(eventString.startsWith("close")){
-						System.out.println("close");
-						running = false;
-						tunnel.close();
-					}
 					
+				}else if(eventString.startsWith("transfer:")){
+						
+				}else if(eventString.startsWith("close")){
+					System.out.println("close");
+					running = false;
+					tunnel.close();
 				}
+					
+				
 				
 				
 				
