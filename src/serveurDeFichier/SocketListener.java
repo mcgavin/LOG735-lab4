@@ -93,7 +93,7 @@ class SocketListener extends Thread{
 					}else if(eventString.startsWith("close")){
 						System.out.println("close");
 						running = false;
-						tunnel.close();
+						tunnel.closeTunnel();
 					}
 					
 				}

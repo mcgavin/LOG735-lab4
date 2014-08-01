@@ -44,6 +44,11 @@ public class TunnelServeurFichier extends AbstractTunnel{
 			
 	}
 	
+	public void closeTunnel(){
+		outputTread.setRunning(false);
+		inputTread.setRunning(false);
+	}
+	
 	public String toString(){
 		
 		return ""+ipLocal+":"+portLocal+" --> "+ipDistant+":"+portDistant;

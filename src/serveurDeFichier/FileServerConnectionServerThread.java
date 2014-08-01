@@ -12,6 +12,7 @@ public class FileServerConnectionServerThread extends Thread{
 	
 	private ServeurFichier serveurFichierLocal;
 	
+	private boolean running; 
 
 	public FileServerConnectionServerThread (int listeningPort, ServeurFichier serveurFichierLocal) throws IOException
 	{
@@ -21,7 +22,7 @@ public class FileServerConnectionServerThread extends Thread{
 	
 	
 	public void run() {
-		
+		running = true;
 		try { 
 			serverSocket = new ServerSocket(listeningPort); 
         } 
@@ -32,7 +33,7 @@ public class FileServerConnectionServerThread extends Thread{
         }
 		
 		System.out.println ("En ecoute au port : " + listeningPort);
-		while(true) {
+		while(running) {
 			Socket clientSocket = null; 
 			
 			try { 
@@ -51,5 +52,11 @@ public class FileServerConnectionServerThread extends Thread{
 			
 			serveurFichierLocal.printServerList();
 		}
+	}
+	/**
+	 * arrete les connection entrante
+	 */
+	public void stopServerThread(){
+		running = false;
 	}
 }

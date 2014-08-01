@@ -36,22 +36,7 @@ public class ServeurFichier {
 	private String servID = "0";
 
 	
-	//***********************
-	// SYNCHRO METHODS
-	
-	public synchronized int getUniqueFileId(){
-	    return Integer.parseInt(""+servID + uniqueId++);
-	}	
-	
-	public synchronized void addTunnelServeurFichierToList(TunnelServeurFichier tunnelServeurFichier) {
-		listTunnelServeurFichier.add(tunnelServeurFichier);
-    }
-	
-	public synchronized void removeTunnelServeurFichierFromList(TunnelServeurFichier tunnelServeurFichier) {
-		listTunnelServeurFichier.remove(tunnelServeurFichier);
-    }
-	
-	
+
 	//***********************
 	// MAIN
 	
@@ -207,6 +192,31 @@ public class ServeurFichier {
 		}
 	}
 	
+	//***********************
+	// SYNCHRO METHODS
+	
+	public synchronized int getUniqueFileId(){
+	    return Integer.parseInt(""+servID + uniqueId++);
+	}	
+	
+	public synchronized void addTunnelServeurFichierToList(TunnelServeurFichier tunnelServeurFichier) {
+		listTunnelServeurFichier.add(tunnelServeurFichier);
+    }
+	
+	public synchronized void removeTunnelServeurFichierFromList(TunnelServeurFichier tunnelServeurFichier) {
+		listTunnelServeurFichier.remove(tunnelServeurFichier);
+    }
+	
+	
+	public synchronized void addTunnelClientToList(TunnelClient tunnelClient) {
+		listTunnelClient.add(tunnelClient);
+    }
+	
+	public synchronized void removeTunnelClientFromList(TunnelClient tunnelClient) {
+		listTunnelClient.remove(tunnelClient);
+    }
+	
+	
 	
 	//***********************
 	// GET METHODE
@@ -239,6 +249,37 @@ public class ServeurFichier {
 //		mySchemaXMLRootNode
 		
 	}
+	
+	/**
+	 * stop every thread properly
+	 * 
+	 * @param tunnelServeurFichier
+	 */
+	public void stopServeurFichier() {
+		
+		if(clientServerThread.isAlive()){
+			clientServerThread.stopServerThread();
+		}
+		if (!listTunnelClient.isEmpty()){
+			for (TunnelClient tunnel : listTunnelClient) {
+				tunnel.closeTunnel();
+			}
+		}
+		
+		
+		if(fileServerThread.isAlive()){
+			fileServerThread.stopServerThread();
+		}
+		if(!listTunnelServeurFichier.isEmpty()){
+			for (TunnelServeurFichier tunnel : listTunnelServeurFichier) {
+				tunnel.closeTunnel();
+			}
+		}
+
+    }
+	
+	
+	
 	
 	
 	//***********************

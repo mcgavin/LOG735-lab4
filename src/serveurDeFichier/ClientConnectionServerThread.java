@@ -14,16 +14,19 @@ public class ClientConnectionServerThread extends Thread{
 	
 	private Socket clientSocket;
 	private ServeurFichier serveurLocal;
+	private boolean running;
 	
 
-	public ClientConnectionServerThread (int listeningPort, ServeurFichier succursaleLocal) throws IOException
+	public ClientConnectionServerThread (int listeningPort, ServeurFichier serveurLocal) throws IOException
 	{
 		this.listeningPort = listeningPort;
-		this.serveurLocal = succursaleLocal;
+		this.serveurLocal = serveurLocal;
 	}
 	
 	
 	public void run() {
+		
+		running = true;
 		
 		try { 
 			serverSocket = new ServerSocket(listeningPort); 
@@ -35,7 +38,7 @@ public class ClientConnectionServerThread extends Thread{
         }
 		
 		System.out.println ("En ecoute au port : " + listeningPort);
-		while(true) {
+		while(running) {
 			Socket clientSocket = null; 
 			
 			try { 
@@ -49,15 +52,19 @@ public class ClientConnectionServerThread extends Thread{
 		    } 
 			
 			//pour une connection d<un serveur
-			TunnelServeurFichier tunnelServeurFichier = new TunnelServeurFichier(clientSocket,serveurLocal);
-			serveurLocal.addTunnelServeurFichierToList(tunnelServeurFichier);
+			TunnelClient tunnelClient = new TunnelClient(clientSocket,serveurLocal);
+			serveurLocal.addTunnelClientToList(tunnelClient);
 			
 			serveurLocal.printClientList();
-
-			
-			// pour une connection d'un client
-			
-			
 		}
 	}
+	
+	/**
+	 * arrete les connection entrante
+	 */
+	public void stopServerThread(){
+		running = false;
+	}
+	
+
 }

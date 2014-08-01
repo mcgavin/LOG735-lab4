@@ -66,7 +66,6 @@ public class TunnelClient extends AbstractTunnel{
 	}
 	
 	public void closeTunnel(){
-		
 		inputTread.setRunning(false);
 		outputTread.setRunning(false);
 	}

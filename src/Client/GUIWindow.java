@@ -48,7 +48,12 @@ public class GUIWindow {
 	private JButton btnDelete;
 	private JTree fileTree;
 	
-	private MainClient mainClient;
+	//XMlHandler
+	private ModelDAO model;
+	
+	//use to send command
+	private MainClient clientController;
+	
 
 	/**
 	 * Launch the application.
@@ -72,12 +77,11 @@ public class GUIWindow {
 	 */
 	@Deprecated
 	public GUIWindow() {
-		this.mainClient = mainClient;
 		initialize();
 	}
 	
-	public GUIWindow(MainClient mainClient) {
-		this.mainClient = mainClient;
+	public GUIWindow(ModelDAO model) {
+		this.model = model;
 		initialize();
 	}
 
@@ -94,13 +98,7 @@ public class GUIWindow {
 		listPanel.setLayout(new GridLayout(0, 1, 0, 0));
 
 		// Load all the tree when 1rst time opening
-		DefaultMutableTreeNode top = LoadAllXmlIntoTree();
-		fileTree = new JTree(top);
-		fileTree.setCellRenderer(new MyTreeCellRenderer());
-
-		for (int i = 0; i < fileTree.getRowCount(); i++) {
-			fileTree.expandRow(i);
-		}
+		updateTree();
 
 		// Selection event
 		fileTree.addTreeSelectionListener(new TreeSelectionListener() {
@@ -223,8 +221,10 @@ public class GUIWindow {
 	                //Id et relname fabriquer par serveur
 	                //On envoit le dataobject a moitier construit au serveur
 	                String dataObjectToSend = xmlParser.ObjectToXMLString(dataObject);
+	                
+	                
 	                //Send dataObjectToSend et le file au serveur
-	                mainClient.sendFile(dataObject, file);
+	                clientController.sendFile(dataObject, file);
 	                
 	            }
 	        }
@@ -277,74 +277,20 @@ public class GUIWindow {
 		mnFile.add(mntmExit);
 	}
 
-	
-	
-	private DefaultMutableTreeNode LoadAllXmlIntoTree() {
-		DefaultMutableTreeNode top = null;
-		DefaultMutableTreeNode completedTree = null;
-		try {
+	public void updateTree(){
+		// Load all the tree when 1rst time opening
+		DefaultMutableTreeNode top = model.loadAllXmlIntoTree();
+		fileTree = new JTree(top);
+		fileTree.setCellRenderer(new MyTreeCellRenderer());
 
-			File fXmlFile = new File("metadata.xml");
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory
-					.newInstance();
-			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(fXmlFile);
-
-			doc.getDocumentElement().normalize();
-
-			System.out.println("Root element :"
-					+ doc.getDocumentElement().getNodeName());
-
-			top = new DefaultMutableTreeNode(doc.getFirstChild().getNodeName());
-			DefaultMutableTreeNode start = new DefaultMutableTreeNode(
-					"Master Root");
-			completedTree = parcourir(doc.getFirstChild(), start);
-		} catch (Exception e) {
-			e.printStackTrace();
+		for (int i = 0; i < fileTree.getRowCount(); i++) {
+			fileTree.expandRow(i);
 		}
-		return completedTree;
+		frame.repaint();
 	}
-
-	public DefaultMutableTreeNode parcourir(Node node,
-			DefaultMutableTreeNode top) {
-		if (node != null) {
-			if (node.getNodeName().equals("file")) {
-				// do something with file
-				if (node.getNodeType() == Node.ELEMENT_NODE) {
-
-					Element eElement = (Element) node;
-					DataObject data = new DataObject();
-					data.setId(Integer.parseInt(eElement.getAttribute("id")));
-					data.setName(eElement.getElementsByTagName("name").item(0)
-							.getTextContent());
-					data.setServer(eElement.getElementsByTagName("server")
-							.item(0).getTextContent());
-					data.setPort(Integer.parseInt(eElement
-							.getElementsByTagName("port").item(0)
-							.getTextContent()));
-					data.setRelName(eElement.getElementsByTagName("relname")
-							.item(0).getTextContent());
-					data.setRepo(eElement.getElementsByTagName("repo").item(0)
-							.getTextContent());
-					data.setOwner(eElement.getElementsByTagName("owner")
-							.item(0).getTextContent());
-					data.setOwner(eElement.getElementsByTagName("lastupdated")
-							.item(0).getTextContent());
-					DefaultMutableTreeNode item = new DefaultMutableTreeNode(
-							data);
-					top.add(item);
-				}
-			} else {
-				DefaultMutableTreeNode item = new DefaultMutableTreeNode(
-						node.getNodeName());
-				for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-					// not a file ? make it a repo in jTREE					
-					parcourir(node.getChildNodes().item(i), item);
-				}
-				top.add(item);
-			}
-		}
-		return top;
+	
+	public void addController(MainClient clientController){
+		this.clientController = clientController;
 	}
 
 	private static class MyTreeCellRenderer extends DefaultTreeCellRenderer {
