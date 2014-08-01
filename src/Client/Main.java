@@ -258,11 +258,9 @@ public class Main {
 				DefaultMutableTreeNode item = new DefaultMutableTreeNode(
 						node.getNodeName());
 				for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-					// not a file ? make it a repo in jTREE
-					DefaultMutableTreeNode item = new DefaultMutableTreeNode(
-							node.getNodeName());
+					// not a file ? make it a repo in jTREE					
 					parcourir(node.getChildNodes().item(i), item);
-					top.add(item);
+
 				}
 				top.add(item);
 			}
