@@ -1,11 +1,8 @@
 package Client;
 
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-
-import com.thoughtworks.xstream.XStream;
 
 
 @XmlRootElement(name = "file")
