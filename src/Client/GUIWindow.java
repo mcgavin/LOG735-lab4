@@ -17,6 +17,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -34,6 +35,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import XMLtool.UpdateMetadata;
 import XMLtool.xmlParser;
 
 public class GUIWindow {
@@ -157,7 +159,14 @@ public class GUIWindow {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
+				String path = JOptionPane.showInputDialog("Enter a name");
+				String repoPath = fileTree.getSelectionPath().toString().replace("[Master Root","").replace("]", "").replace(", ", "/");
 				
+				//APPELLE AU SERVEUR POUR FAIRE : UpdateMetadata.DeleteRepo(repoPath);
+				//METHODE BROADCOAST METADATA_CHANGE
+				
+				//For test local only:
+				//UpdateMetadata.DeleteRepo(repoPath);
 			}
 			
 		});
@@ -170,9 +179,19 @@ public class GUIWindow {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				
+				String repoPath = fileTree.getSelectionPath().toString().replace("[Master Root","").replace("]", "").replace(", ", "/");
+				int selectedOption = JOptionPane.showConfirmDialog(null, 
+                        "Do you want to delete the repository and all it's content?", 
+                        "Choose", 
+                        JOptionPane.YES_NO_OPTION);
+				if(selectedOption == JOptionPane.YES_OPTION){
+					//APPELLE AU SERVEUR POUR FAIRE : UpdateMetadata.DeleteRepo(repoPath);
+					//METHODE BROADCOAST METADATA_CHANGE
+					
+					//Pour test local only:
+					//UpdateMetadata.DeleteRepo(repoPath);
+				}
 			}
-			
 		});
 
 		btnUpload = new JButton("Upload");
@@ -189,7 +208,7 @@ public class GUIWindow {
 	                File file = _fileChooser.getSelectedFile();
 	                
 	                String repoPath = fileTree.getSelectionPath().toString().replace("[Master Root","").replace("]", "").replace(", ", "/");
-
+	                
 	                //... Update user interface.
 
 	                DataObject dataObject = new DataObject();
@@ -218,8 +237,13 @@ public class GUIWindow {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-				
+				// TODO A FAIRE
+				//ICI FONCTION DOWNLOAD
+				//DU CODE
+				//get selected dataobject
+				int nbObj = fileTree.getSelectionPath().getPath().length;
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) fileTree.getSelectionPath().getPath()[nbObj-1];
+				DataObject dataObject = (DataObject) node.getUserObject();
 			}
 			
 		});
@@ -232,7 +256,13 @@ public class GUIWindow {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				
+				int nbObj = fileTree.getSelectionPath().getPath().length;
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) fileTree.getSelectionPath().getPath()[nbObj-1];
+				DataObject dataObject = (DataObject) node.getUserObject();
+				//TODO ENVOYER DATAOBJECT AU SERVEUR AVEC L'ACTION DELETE
+				String test = "bob";
+				//Test local:
+				//UpdateMetadata.DeleteFile(dataObject);
 			}
 			
 		});

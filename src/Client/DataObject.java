@@ -4,8 +4,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-
-
 @XmlRootElement(name = "file")
 @XmlType(propOrder = {"name", "server", "port", "relName", "repo", "owner", "lastUpdated"})
 public class DataObject {
