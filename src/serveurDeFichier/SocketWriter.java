@@ -13,23 +13,18 @@ class SocketWriter extends Thread{
 	private SyncedWriteList thingsToWrite;
 	private boolean running;
 	
-	public SocketWriter(Socket clientSocket, SyncedWriteList thingsToWrite){
+	public SocketWriter(Socket clientSocket, SyncedWriteList thingsToWrite) throws IOException {
+		
 		running = true;
-		try {
-			oos = new ObjectOutputStream(clientSocket.getOutputStream());
-			this.thingsToWrite = thingsToWrite;
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		oos = new ObjectOutputStream(clientSocket.getOutputStream());
+		this.thingsToWrite = thingsToWrite;
 	}
 	
 	public void run() {
 		//write whats in the list
 		while(running){
-			
-			if (!thingsToWrite.isEmpty()){
-				try {
+			try{
+				if (!thingsToWrite.isEmpty()){
 					String string = (String) thingsToWrite.get(0);
 					
 					if(string.equals("file")){
@@ -53,13 +48,10 @@ class SocketWriter extends Thread{
 						oos.writeObject(string);
 						thingsToWrite.remove(0);
 					}
-				
-					
-					
-					
-				} catch (IOException | InterruptedException e) {
-					e.printStackTrace();
 				}
+
+			} catch (IOException | InterruptedException e) {
+				System.err.println("OHoH");
 			}
 		}
 	}

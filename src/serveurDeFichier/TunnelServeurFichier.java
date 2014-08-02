@@ -1,15 +1,8 @@
 package serveurDeFichier;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.util.ArrayList;
 
-import XMLtool.SyncedWriteList;
-import XMLtool.xmlParser;
 import Client.DataObject;
 
 public class TunnelServeurFichier extends AbstractTunnel{
@@ -24,30 +17,27 @@ public class TunnelServeurFichier extends AbstractTunnel{
 	private SocketWriter outputTread;
 	private SocketListener inputTread;
 	
-	//private SyncedWriteList writeList;
-	//instance of the initiator
-	//private ServeurFichier serveurFichierLocal;
-	private int succID;
-	private boolean record;
-	
 	//instancier a partire de 0
 	public TunnelServeurFichier(Socket clientSocket, ServeurFichier serveurFichierLocal){
 		
-		super();
-		ipLocal = clientSocket.getLocalAddress().getHostAddress();
-		portLocal = clientSocket.getLocalPort();
-		
-		ipDistant = clientSocket.getInetAddress().getHostAddress();
-		portDistant = clientSocket.getPort();
-		
-		this.serveurFichierLocal = serveurFichierLocal;
+			super();
+			ipLocal = clientSocket.getLocalAddress().getHostAddress();
+			portLocal = clientSocket.getLocalPort();
+			
+			ipDistant = clientSocket.getInetAddress().getHostAddress();
+			portDistant = clientSocket.getPort();
+			
+			this.serveurFichierLocal = serveurFichierLocal;
+	
+			try {
+				outputTread = new SocketWriter(clientSocket,writeList);
+				inputTread = new SocketListener(clientSocket,this );
+				outputTread.start();
+				inputTread.start();
+			} catch (IOException e) {
 
-//		writeList = new SyncedWriteList();
-		
-		outputTread = new SocketWriter(clientSocket,writeList );
-		inputTread = new SocketListener(clientSocket,this );
-		outputTread.start();
-		inputTread.start();
+				closeTunnel();
+			}
 			
 	}
 	
@@ -57,6 +47,7 @@ public class TunnelServeurFichier extends AbstractTunnel{
 	public void closeTunnel(){
 		outputTread.setRunning(false);
 		inputTread.setRunning(false);
+		this.serveurFichierLocal.removeTunnelServeurFichierFromList(this);
 	}
 	
 	public String toString(){
@@ -70,9 +61,6 @@ public class TunnelServeurFichier extends AbstractTunnel{
 	public void modifyXML(DataObject dataObject,String action){
 		serveurFichierLocal.modifyXml(dataObject, action, "client");
 	}
-
-
-
 
 	@Override
 	public void sendFile(DataObject dataObj) {

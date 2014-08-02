@@ -2,14 +2,9 @@ package serveurDeFichier;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.util.ArrayList;
 
-import XMLtool.SyncedWriteList;
-import XMLtool.xmlParser;
 import Client.DataObject;
 
 public class TunnelClient extends AbstractTunnel{
@@ -24,13 +19,6 @@ public class TunnelClient extends AbstractTunnel{
 	private SocketWriter outputTread;
 	private SocketListener inputTread;
 	
-//	private SyncedWriteList writeList;
-	//instance of the initiator
-	//private ServeurFichier serveurFichierLocal;
-	private int succID;
-	private boolean record;
-	
-	//instancier a partire de 0
 	public TunnelClient(Socket clientSocket, ServeurFichier serveurFichierLocal){
 		super();
 		
@@ -41,7 +29,6 @@ public class TunnelClient extends AbstractTunnel{
 		portDistant = clientSocket.getPort();
 		this.serveurFichierLocal = serveurFichierLocal;
 
-//		writeList = new SyncedWriteList();
 		
 		try {
 			
@@ -54,18 +41,11 @@ public class TunnelClient extends AbstractTunnel{
 			
 		} catch (Exception e) {
 			System.err.println("failed to create Object or cast readObject");
-			e.printStackTrace();
+			closeTunnel();
 		}
 	}
 	
-		
-	public String toString(){
-		
-		return ""+ipLocal+":"+portLocal+" --> "+ipDistant+":"+portDistant;
-	}
-	
 	public void sendFile(DataObject dataObj){
-		
 		byte[] content;
 		try {
 			File fileToSend = new File(dataObj.getRelName());
@@ -78,15 +58,9 @@ public class TunnelClient extends AbstractTunnel{
 			System.err.println("error getting file");
 			e.printStackTrace();
 		}
-		
-		
+
 	}
 
-//	public void addNewFileToXml(DataObject dataObject) {
-//		this.serveurFichierLocal.addNewFileToXml(dataObject);
-//		this.serveurFichierLocal.mo
-//	}
-	
 	public void modifyXML(String repoPath, String name,String action){
 		serveurFichierLocal.modifyXmlFromRepo(action, repoPath , name,"all");
 	}
@@ -98,8 +72,13 @@ public class TunnelClient extends AbstractTunnel{
 	public void closeTunnel(){
 		inputTread.setRunning(false);
 		outputTread.setRunning(false);
+		this.serveurFichierLocal.removeTunnelClientFromList(this);
 	}
-
+	
+	public String toString(){
+		
+		return ""+ipLocal+":"+portLocal+" --> "+ipDistant+":"+portDistant;
+	}
 
 
 }

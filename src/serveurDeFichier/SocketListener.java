@@ -56,8 +56,7 @@ class SocketListener extends Thread{
 					
 					if (eventString.startsWith("file")){
 						
-						//XXX delete ouput
-						System.out.println("Oh shit a file...");
+						System.out.println("Receiving file");
 						
 						//expect partially filled dataObject ( name, owner, repo)
 						String xml = (String) ois.readObject();
@@ -133,17 +132,15 @@ class SocketListener extends Thread{
 				try {
 					
 					this.socket.close();
-					System.out.println("arf");
-					running = false;
-					
+//					System.out.println("arf");
+					setRunning(false);
+					tunnel.closeTunnel();
 					
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
 			}
-
 		}
-		
 	}
 	public boolean isRunning() {
 		return running;
