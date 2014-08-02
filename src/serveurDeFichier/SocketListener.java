@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.util.UUID;
 
+import XMLtool.UpdateMetadata;
 import XMLtool.xmlParser;
 import Client.DataObject;
 
@@ -48,10 +50,6 @@ class SocketListener extends Thread{
 		//Ecoute et traite les evenements
 		while(running){
 			try {
-				Object event = ois.readObject();
-				
-				//String event = ois.readObject().toString();
-				
 				if(true){
 					String eventString  = ois.readObject().toString();
 					
@@ -65,35 +63,63 @@ class SocketListener extends Thread{
 						String xml = (String) ois.readObject();
 						
 						DataObject dataObject = xmlParser.xmlStringToObject(xml);
+						String uniqueId = UUID.randomUUID().toString();
+						dataObject.setId(uniqueId);
+						dataObject.setRelName(Integer.toString(dataObject.hashCode()));
 						
 						//XXX delete ouput
 						System.out.println(dataObject);
 						
 						//create file 
-						File f = new File(dataObject.getName()) ;
+						File f = new File(dataObject.getRelName()) ;
 						
 						//get file from user
 						byte[] content = (byte[]) ois.readObject();
 
-							Files.write(f.toPath(), content);
-						
-
-
+						Files.write(f.toPath(), content);
 						
 						//XXX delete ouput
 						System.out.println("file transfered");
 						
+						//UPDATE XML AND BROADCAST
+						tunnel.modifyXML(dataObject, "addFile");
 						
-						//fill dataObject
-						tunnel.addAndFillDataObject(dataObject);
 						
+					}else if(eventString.startsWith("download")){
+						String[] s = eventString.split(":");
+						DataObject dataobj = xmlParser.xmlStringToObject(s[1]);
 						
-					}else if(eventString.startsWith("transfer:")){
+						tunnel.sendFile(dataobj);
 						
 					}else if(eventString.startsWith("close")){
 						System.out.println("close");
 						running = false;
 						tunnel.closeTunnel();
+						
+						
+					}else if(eventString.startsWith("addFile")){
+						String[] s = eventString.split(":");
+						DataObject dataobj = xmlParser.xmlStringToObject(s[1]);
+						//Aviser mes clients
+						tunnel.modifyXML(dataobj, "addFile");
+						
+					}else if(eventString.startsWith("deleteFile")){
+						String[] s = eventString.split(":");
+						DataObject dataobj = xmlParser.xmlStringToObject(s[1]);
+						//Aviser mes clients
+						tunnel.modifyXML(dataobj, "deleteFile");
+						
+					}else if(eventString.startsWith("addRepo")){
+						
+						String[] s = eventString.split(":");
+						//s[1]= repoPath, s[2]=name
+						tunnel.modifyXML(s[1], s[2], "addRepo");
+						
+					}else if(eventString.startsWith("deleteRepo")){
+						
+						String[] s = eventString.split(":");
+						//s[1]= repoPath
+						tunnel.modifyXML(s[1], null, "deleteRepo");
 					}
 					
 				}

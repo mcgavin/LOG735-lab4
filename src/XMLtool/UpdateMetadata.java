@@ -84,7 +84,7 @@ public class UpdateMetadata {
 
 			// update file attribute
 			Attr attr = doc.createAttribute("id");
-			attr.setValue(Integer.toString(dataObject.getId()));
+			attr.setValue(dataObject.getId());
 			fileTodAdd.setAttributeNode(attr);
 
 			// name elements
@@ -161,7 +161,7 @@ public class UpdateMetadata {
 			Node file = null;
 			for (int i = 0; i < fileList.getLength(); i++) {
 				if (fileList.item(i).getAttributes().item(0).getTextContent()
-						.equals(Integer.toString(dataObject.getId()))) {
+						.equals(dataObject.getId())) {
 					file = fileList.item(i);
 				}
 			}
@@ -239,7 +239,7 @@ public class UpdateMetadata {
 			Node file = null;
 			for (int i = 0; i < fileList.getLength(); i++) {
 				if (fileList.item(i).getAttributes().item(0).getTextContent()
-						.equals(Integer.toString(dataObject.getId()))) {
+						.equals(dataObject.getId())) {
 					file = fileList.item(i);
 				}
 			}

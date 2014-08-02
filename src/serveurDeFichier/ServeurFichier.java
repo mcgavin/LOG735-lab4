@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import XMLtool.UpdateMetadata;
 import Client.DataObject;
 import pointEntree.ServeurFichierInfo;
 
@@ -89,7 +90,8 @@ public class ServeurFichier {
 		
 		
 		//intervale random pour port entre 5000 et 10000
-		this.portClient = (int) (5000 + (Math.random()* (7000-5000)));
+//		this.portClient = (int) (5000 + (Math.random()* (7000-5000)));
+		this.portClient = 2015;
 		this.portServeur = (int) (7000 + (Math.random()* (10000-7000)));
 		
 		
@@ -235,14 +237,91 @@ public class ServeurFichier {
 	
 
 	
-	
-	public void addAndFillDataObject(DataObject newDataObject){
-		newDataObject.setServer(getIpAdress());
-		newDataObject.setPort(getClientConnectionPort());
-		newDataObject.setId(getUniqueFileId());
-
-		//modifyMetaData( new action(add), newDataObject.getrepo());
+	/**
+	 * 
+	 * @param newDataObject
+	 * @param action	  {addFile |addRepo}
+	 * @param destination {client |all}
+	 */
+	public void modifyXml(DataObject dataObject, String action,String destination){
+		
+		if (action.equals("addFile")){
+			UpdateMetadata.AddNewFile(dataObject);
+			
+			if (destination.equals("client")){
+				broacastToCLients(dataObject,action );
+			}else{
+				broacastToALL(dataObject,action );
+			}
+		}else if (action.equals("deleteFile")){
+			
+			UpdateMetadata.DeleteFile(dataObject);
+			if (destination.equals("client")){
+				broacastToCLients(dataObject,action );
+			}else{
+				broacastToALL(dataObject,action );
+			}
+		}else{
+		System.err.println("ERROR");
+		}
+		
 	}
+	
+	/**
+	 * 
+	 * @param repoPath
+	 * @param action	  {|deleteRepo |addRepo}
+	 * @param destination {client |all}
+	 */
+	public void modifyXmlFromRepo(String action, String repoPath, String name, String destination) {
+
+		if (action.equals("addRepo")){
+			
+			UpdateMetadata.AddRepo(repoPath, name);
+			if (destination.equals("client")){
+				broacastToCLients(repoPath, name, action );
+			}else{
+				broacastToALL(repoPath, name, action );
+			}
+		}else if (action.equals("deleteRepo")){
+			
+			UpdateMetadata.DeleteRepo(repoPath);
+			if (destination.equals("client")){
+				broacastToCLients(repoPath, name, action );
+			}else{
+				broacastToALL(repoPath, name, action );
+			}
+		}
+	}
+	
+	private void broacastToALL(DataObject newDataObject, String action) {
+		for (TunnelServeurFichier tunnel : listTunnelServeurFichier) {
+			tunnel.sendXmlModification(newDataObject, action);
+		}
+		broacastToCLients( newDataObject,action);
+	}
+	
+	private void broacastToCLients(DataObject newDataObject,String action) {
+		for (TunnelClient tunnel : listTunnelClient) {
+			tunnel.sendXmlModification(newDataObject,action);
+		}
+	}
+	
+	
+	
+	private void broacastToALL(String repoPath,String name,String action) {
+		for (TunnelServeurFichier tunnel : listTunnelServeurFichier) {
+			tunnel.sendXmlModification(repoPath, name, action);
+		}
+		broacastToCLients(repoPath, name, action);
+	}
+	private void broacastToCLients(String repoPath,String name,String action) {
+		for (TunnelClient tunnel : listTunnelClient) {
+			tunnel.sendXmlModification( repoPath, name, action);
+		}
+	}
+
+	
 	
 	public void modifyMetaData(  DataObject dataObject){
 		
@@ -318,6 +397,9 @@ public class ServeurFichier {
 		System.out.println(output);
 		return output;
 	}
+
+
+	
 
 	
 }

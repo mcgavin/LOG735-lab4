@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.util.ArrayList;
 
+import XMLtool.SyncedWriteList;
 import XMLtool.xmlParser;
 
 public class TunnelClientServeurFichier{
@@ -96,7 +97,34 @@ public class TunnelClientServeurFichier{
 		
 		return ""+ipLocal+":"+portLocal+" --> "+ipDistant+":"+portDistant;
 	}
-	
+
+	public void sendXMLModification(String repoPath, String name, String action) {
+		writeList.add(action+":"+repoPath+":"+name);
+		
+	}
+	public void sendXMLModification(DataObject dataObject) {
+		writeList.add("deleteFile:"+xmlParser.ObjectToXMLString(dataObject));
+		String s = "af";
+	}
+
+	public void modifyXML(String repoPath, String name, String action) {
+		if(action.equals("addRepo")){
+			mainClient.xmlHandler.AddRepo(repoPath, name);
+			mainClient.refresh();
+		} else{
+			mainClient.xmlHandler.DeleteRepo(repoPath);
+			mainClient.refresh();
+		}
+	}
+	public void modifyXML(DataObject dataObject, String action){
+		if(action.equals("addFile")){
+			mainClient.xmlHandler.AddNewFile(dataObject);
+			mainClient.refresh();
+		} else{
+			mainClient.xmlHandler.DeleteFile(dataObject);
+			mainClient.refresh();
+		}
+	}	
 	
 }
 

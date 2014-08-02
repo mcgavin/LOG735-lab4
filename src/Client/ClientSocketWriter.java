@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-
+import XMLtool.SyncedWriteList;
 import XMLtool.xmlParser;
 
 class ClientSocketWriter extends Thread{
@@ -53,9 +53,13 @@ class ClientSocketWriter extends Thread{
 						
 						System.out.println("file Sent");
 						
+					}else if(s.startsWith("addRepo")){
+						
+						oos.writeObject(s);
+						thingsToWrite.remove(0);
 					}else{
 					
-						oos.writeObject(thingsToWrite.get(0));
+						oos.writeObject(s);
 						thingsToWrite.remove(0);
 					}
 					

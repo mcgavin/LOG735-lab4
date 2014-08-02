@@ -5,17 +5,19 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import XMLtool.SyncedWriteList;
+
 class SocketWriter extends Thread{
 	
 	private ObjectOutputStream oos;
-	private SyncedWriteList stringToWrite;
+	private SyncedWriteList thingsToWrite;
 	private boolean running;
 	
-	public SocketWriter(Socket clientSocket, SyncedWriteList stringToWrite){
+	public SocketWriter(Socket clientSocket, SyncedWriteList thingsToWrite){
 		running = true;
 		try {
 			oos = new ObjectOutputStream(clientSocket.getOutputStream());
-			this.stringToWrite = stringToWrite;
+			this.thingsToWrite = thingsToWrite;
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -26,11 +28,36 @@ class SocketWriter extends Thread{
 		//write whats in the list
 		while(running){
 			
-			if (!stringToWrite.isEmpty()){
+			if (!thingsToWrite.isEmpty()){
 				try {
-					oos.writeObject(stringToWrite.get(0));
-					stringToWrite.remove(0);
-				} catch (IOException e) {
+					String string = (String) thingsToWrite.get(0);
+					
+					if(string.equals("file")){
+					
+						thingsToWrite.remove(0);
+
+						Thread.sleep(1000);
+						//write the file
+						byte[] content  = ( byte[] )thingsToWrite.getNRemoveFirst();
+						oos.writeObject(content);
+
+						
+						System.out.println("file Sent");
+						
+					}else if(string.startsWith("addfile")|string.startsWith("deleteFile")|string.startsWith("addrepo")|string.startsWith("deleteRepo")){
+						
+						oos.writeObject(string);
+						thingsToWrite.remove(0);
+						
+					}else{
+						oos.writeObject(string);
+						thingsToWrite.remove(0);
+					}
+				
+					
+					
+					
+				} catch (IOException | InterruptedException e) {
 					e.printStackTrace();
 				}
 			}

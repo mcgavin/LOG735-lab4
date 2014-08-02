@@ -50,30 +50,26 @@ class ClientSocketListener extends Thread{
 			try {
 				
 				String eventString  = ois.readObject().toString();
-				if (eventString.startsWith("file")){
+				if (eventString.startsWith("addRepo")){
+					String[] s = eventString.split(":");
+					//s[1]= repoPath, s[2]=name
+					tunnel.modifyXML(s[1], s[2], "addRepo");
 					
-					//create file 
-					File f = new File("temp") ;
+				}else if(eventString.startsWith("deleteRepo")){
+					String[] s = eventString.split(":");
+					//s[1]= repoPath, s[2]=name
+					tunnel.modifyXML(s[1], null, "deleteRepo");
 					
-					//get file from user
-					byte[] content = (byte[]) ois.readObject();
-
-					Files.write(f.toPath(), content);
-					
-
-
-					
-				}else if(eventString.startsWith("transfer:")){
-						
-				}else if(eventString.startsWith("close")){
-					System.out.println("close");
-					running = false;
-					tunnel.close();
+				}else if(eventString.startsWith("addFile")){
+					String[] s = eventString.split(":");
+					DataObject dataobj = xmlParser.xmlStringToObject(s[1]);
+					tunnel.modifyXML(dataobj, "addFile");
 				}
-					
-				
-				
-				
+				else if(eventString.startsWith("deleteFile")){
+					String[] s = eventString.split(":");
+					DataObject dataobj = xmlParser.xmlStringToObject(s[1]);
+					tunnel.modifyXML(dataobj, "deleteFile");
+				}
 				
 			} catch (IOException | ClassNotFoundException e) {	
 				

@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "file")
 @XmlType(propOrder = {"name", "server", "port", "relName", "repo", "owner", "lastUpdated"})
 public class DataObject {
-	private int id;
+	private String id;
 	private String name;
 	private String server;
 	private int port;
@@ -20,7 +20,7 @@ public class DataObject {
 	
 	
 	
-	public DataObject(int id, String name, String server, int port, String relName, String repo, String owner,String lastUpdated) {
+	public DataObject(String id, String name, String server, int port, String relName, String repo, String owner,String lastUpdated) {
 		this.id = id;
 		this.name = name;
 		this.server = server;
@@ -32,12 +32,12 @@ public class DataObject {
 	}
 	
 	@XmlAttribute
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 	
 	
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

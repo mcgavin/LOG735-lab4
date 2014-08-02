@@ -28,6 +28,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -157,12 +158,12 @@ public class GUIWindow {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				String path = JOptionPane.showInputDialog("Enter a name");
+				String name = JOptionPane.showInputDialog("Enter a name");
 				String repoPath = fileTree.getSelectionPath().toString().replace("[Master Root","").replace("]", "").replace(", ", "/");
 				
 				//APPELLE AU SERVEUR POUR FAIRE : UpdateMetadata.DeleteRepo(repoPath);
 				//METHODE BROADCOAST METADATA_CHANGE
-				
+				clientController.sendXMLModification(repoPath, name, "addRepo");
 				//For test local only:
 				//UpdateMetadata.DeleteRepo(repoPath);
 			}
@@ -183,11 +184,7 @@ public class GUIWindow {
                         "Choose", 
                         JOptionPane.YES_NO_OPTION);
 				if(selectedOption == JOptionPane.YES_OPTION){
-					//APPELLE AU SERVEUR POUR FAIRE : UpdateMetadata.DeleteRepo(repoPath);
-					//METHODE BROADCOAST METADATA_CHANGE
-					
-					//Pour test local only:
-					//UpdateMetadata.DeleteRepo(repoPath);
+					clientController.sendXMLModification(repoPath, null, "deleteRepo");
 				}
 			}
 		});
@@ -211,10 +208,8 @@ public class GUIWindow {
 
 	                DataObject dataObject = new DataObject();
 	                dataObject.setName(file.getName());
-	                //dataObject.setServer(fileServerInfo[0]);
-	                //dataObject.setPort(fileServerInfo[1]);
 	                dataObject.setOwner("Client");
-	                DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+	                DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH-mm");
 	                Date date = new Date();
 	                dataObject.setLastUpdated(dateFormat.format(date));
 	                dataObject.setRepo(repoPath);
@@ -237,13 +232,10 @@ public class GUIWindow {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO A FAIRE
-				//ICI FONCTION DOWNLOAD
-				//DU CODE
-				//get selected dataobject
 				int nbObj = fileTree.getSelectionPath().getPath().length;
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) fileTree.getSelectionPath().getPath()[nbObj-1];
 				DataObject dataObject = (DataObject) node.getUserObject();
+				clientController.downloadFile(dataObject);
 			}
 			
 		});
@@ -260,9 +252,9 @@ public class GUIWindow {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) fileTree.getSelectionPath().getPath()[nbObj-1];
 				DataObject dataObject = (DataObject) node.getUserObject();
 				//TODO ENVOYER DATAOBJECT AU SERVEUR AVEC L'ACTION DELETE
-				String test = "bob";
 				//Test local:
 				//UpdateMetadata.DeleteFile(dataObject);
+				clientController.sendXMLModification(dataObject);
 			}
 			
 		});
@@ -277,7 +269,7 @@ public class GUIWindow {
 		mnFile.add(mntmExit);
 	}
 
-	public void updateTree(){
+	private void updateTree(){
 		// Load all the tree when 1rst time opening
 		DefaultMutableTreeNode top = model.loadAllXmlIntoTree();
 		fileTree = new JTree(top);
@@ -286,7 +278,14 @@ public class GUIWindow {
 		for (int i = 0; i < fileTree.getRowCount(); i++) {
 			fileTree.expandRow(i);
 		}
-		frame.repaint();
+	}
+	
+	public void refreshTree(){
+		DefaultMutableTreeNode top = model.loadAllXmlIntoTree();
+		fileTree = new JTree(top);
+		DefaultTreeModel dtmModel = (DefaultTreeModel)fileTree.getModel();
+		dtmModel.reload();
+		System.out.println("2234");
 	}
 	
 	public void addController(MainClient clientController){

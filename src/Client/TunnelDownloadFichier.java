@@ -29,10 +29,10 @@ public class TunnelDownloadFichier{
 			ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
 			
 			//say i wanna download
-			oos.writeObject("download");
+			oos.writeObject("download:"+xmlParser.ObjectToXMLString(dataObj));
 			
 			//say i wanna download this file
-			oos.writeObject(xmlParser.ObjectToXMLString(dataObj));
+//			oos.writeObject(xmlParser.ObjectToXMLString(dataObj));
 			
 			//getting file sent by the server
 			byte[] content = (byte[]) ois.readObject();
@@ -51,12 +51,10 @@ public class TunnelDownloadFichier{
 				}        
 				if(result) {    
 					System.out.println("DIR created");  
-					
-					Path path = Paths.get(dataObj.getRepo()+"/"+dataObj.getName());
-					Files.write(path, content);
-					
 				}
 			}
+			Path path = Paths.get(dataObj.getRepo()+"/"+dataObj.getName());
+			Files.write(path, content);
 			oos.writeObject("close");
 		
 		} catch (IOException | ClassNotFoundException e) {

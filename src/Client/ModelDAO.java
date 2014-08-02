@@ -25,12 +25,9 @@ import Client.DataObject;
 public class ModelDAO {
 	
 	private Document doc;
-	private String filepath = "metadata.xml";
+	private String filepath = "Client/metadata.xml";
 	
 	public ModelDAO() {
-		
-		
-		
 		try {
 			
 			
@@ -53,7 +50,6 @@ public class ModelDAO {
 	public void AddNewFile(DataObject dataObject) {
 		try {
 
-			String filepath = "metadata.xml";
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory
 					.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -75,7 +71,7 @@ public class ModelDAO {
 
 			// update file attribute
 			Attr attr = doc.createAttribute("id");
-			attr.setValue(Integer.toString(dataObject.getId()));
+			attr.setValue((dataObject.getId()));
 			fileTodAdd.setAttributeNode(attr);
 
 			// name elements
@@ -135,87 +131,8 @@ public class ModelDAO {
 		}
 	}
 
-	@Deprecated
-	public void ModifyFile(DataObject dataObject) {
-		try {
-			String filepath = "metadata.xml";
-			DocumentBuilderFactory docFactory = DocumentBuilderFactory
-					.newInstance();
-			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-			Document doc = docBuilder.parse(filepath);
-
-			// Pour simplifer, on fait getElement by name au lieu de faire une
-			// vrai recherche. PAS DE NOEUD AVEC NOM SIMILAIRE SINON CA MARCHE
-			// PAS !
-			NodeList fileList = doc.getElementsByTagName("file");
-			Node file = null;
-			for (int i = 0; i < fileList.getLength(); i++) {
-				if (fileList.item(i).getAttributes().item(0).getTextContent()
-						.equals(Integer.toString(dataObject.getId()))) {
-					file = fileList.item(i);
-				}
-			}
-
-			// Modify les children du file a modifier
-			NodeList list = file.getChildNodes();
-			for (int i = 0; i < list.getLength(); i++) {
-				Node node = list.item(i);
-
-				// update name value
-				if ("name".equals(node.getNodeName())) {
-					node.setTextContent(dataObject.getName());
-				}
-
-				// update server value
-				if ("server".equals(node.getNodeName())) {
-					node.setTextContent(dataObject.getServer());
-				}
-
-				// update port value
-				if ("port".equals(node.getNodeName())) {
-					node.setTextContent(Integer.toString(dataObject.getPort()));
-				}
-
-				// update absPath value
-				if ("relname".equals(node.getNodeName())) {
-					node.setTextContent(dataObject.getRelName());
-				}
-
-				// update repo value
-				if ("repo".equals(node.getNodeName())) {
-					node.setTextContent(dataObject.getRepo());
-				}
-
-				// update owner value
-				if ("owner".equals(node.getNodeName())) {
-					node.setTextContent(dataObject.getOwner());
-				}
-			}
-
-			// write the content into xml file
-			TransformerFactory transformerFactory = TransformerFactory
-					.newInstance();
-			Transformer transformer = transformerFactory.newTransformer();
-			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(new File(filepath));
-			transformer.transform(source, result);
-
-			System.out.println("Modify Done");
-
-		} catch (ParserConfigurationException pce) {
-			pce.printStackTrace();
-		} catch (TransformerException tfe) {
-			tfe.printStackTrace();
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-		} catch (SAXException sae) {
-			sae.printStackTrace();
-		}
-	}
-
 	public void DeleteFile(DataObject dataObject) {
 		try {
-			String filepath = "metadata.xml";
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory
 					.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -229,7 +146,7 @@ public class ModelDAO {
 			Node file = null;
 			for (int i = 0; i < fileList.getLength(); i++) {
 				if (fileList.item(i).getAttributes().item(0).getTextContent()
-						.equals(Integer.toString(dataObject.getId()))) {
+						.equals((dataObject.getId()))) {
 					file = fileList.item(i);
 				}
 			}
@@ -260,6 +177,83 @@ public class ModelDAO {
 		}
 	}
 	
+	public void AddRepo(String repo, String name) {
+		try {
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory
+					.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse(filepath);
+
+			String[] repoPath = repo.split("/");
+			int nbSplits = repoPath.length;
+			Node nodeToPlaceNewRepo = null;
+			nodeToPlaceNewRepo = doc.getElementsByTagName(
+					repoPath[nbSplits - 1]).item(0);
+
+			Element repoToAdd = doc.createElement(name);
+			nodeToPlaceNewRepo.appendChild(repoToAdd);
+
+			TransformerFactory transformerFactory = TransformerFactory
+					.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(new File(filepath));
+			transformer.transform(source, result);
+
+			System.out.println("Adding Repo Done");
+
+		} catch (ParserConfigurationException pce) {
+			pce.printStackTrace();
+		} catch (TransformerException tfe) {
+			tfe.printStackTrace();
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		} catch (SAXException sae) {
+			sae.printStackTrace();
+		}
+	}
+	
+	public void DeleteRepo(String repo) {
+		try {
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory
+					.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse(filepath);
+
+			// Find node to delete
+			// Pour simplifer, on fait getElement by name au lieu de faire une
+			// vrai recherche. PAS DE NOEUD AVEC NOM SIMILAIRE SINON CA MARCHE
+			// PAS !
+			String[] repoPath = repo.split("/");
+			int nbSplits = repoPath.length;
+			Node nodeToDelete = doc.getElementsByTagName(
+					repoPath[nbSplits - 1]).item(0);
+
+			Node parent = nodeToDelete.getParentNode();
+			parent.removeChild(nodeToDelete);
+
+			// write the content into xml file
+			TransformerFactory transformerFactory = TransformerFactory
+					.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(new File(filepath));
+			transformer.transform(source, result);
+
+			System.out.println("Delete Repo Done");
+
+		} catch (ParserConfigurationException pce) {
+			pce.printStackTrace();
+		} catch (TransformerException tfe) {
+			tfe.printStackTrace();
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		} catch (SAXException sae) {
+			sae.printStackTrace();
+		} catch (NullPointerException e) {
+			System.err.println("Repo does not exist.");
+		}
+	}
 	
 	public DefaultMutableTreeNode loadAllXmlIntoTree() {
 		DefaultMutableTreeNode top = null;
@@ -296,7 +290,7 @@ public class ModelDAO {
 
 					Element eElement = (Element) node;
 					DataObject data = new DataObject();
-					data.setId(Integer.parseInt(eElement.getAttribute("id")));
+					data.setId((eElement.getAttribute("id")));
 					data.setName(eElement.getElementsByTagName("name").item(0)
 							.getTextContent());
 					data.setServer(eElement.getElementsByTagName("server")

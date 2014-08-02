@@ -1,4 +1,4 @@
-package serveurDeFichier;
+package XMLtool;
 
 import java.util.ArrayList;
 
@@ -9,13 +9,13 @@ import java.util.ArrayList;
  * ( lock to acces the writeList)
  *
  */
-class SyncedWriteList {
+public class SyncedWriteList {
 	
-	private ArrayList<String> arraylist ;
+	private ArrayList<Object> arraylist ;
 	private Object lock = new Object();
 	
 	public SyncedWriteList(){
-		this.arraylist = new ArrayList<String>() ;
+		this.arraylist = new ArrayList<Object>() ;
 	}
 	
 	public void add(String s) {
@@ -23,6 +23,14 @@ class SyncedWriteList {
 		   this.arraylist.add(s);
         }
 	}
+	
+	//this is for file transfer
+	public void addObject(byte[] content) {
+		   synchronized(lock) {
+			   this.arraylist.add(content);
+	        }
+		}
+	
 
 	public void remove(int index){
 	   synchronized(lock) {
@@ -33,12 +41,21 @@ class SyncedWriteList {
 	/**
 	 *  get by index
 	 * @param index
-	 * @return String at the index 
+	 * @return Object at the index 
 	 */
-	public String get(int index){
-		String s;
+	public Object get(int index){
+		Object s;
 	    synchronized(lock) {
 		   s = this.arraylist.get(index);
+        }
+	    return s;
+	}
+	
+	public Object getNRemoveFirst(){
+		Object s;
+	    synchronized(lock) {
+		   s = this.arraylist.get(0);
+		   this.arraylist.remove(0);
         }
 	    return s;
 	}

@@ -1,20 +1,12 @@
 package Client;
 
 import java.awt.EventQueue;
-import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.file.Files;
-
-import javax.sound.sampled.Port;
-
-import com.sun.java.swing.plaf.windows.resources.windows;
-
-import XMLtool.xmlParser;
 
 public class MainClient {
 
@@ -38,7 +30,7 @@ public class MainClient {
 		
 		
 	}
-
+	private GUIWindow window;
 	private ObjectOutputStream oos;
 	private ObjectInputStream ois;
 	private Socket socket;
@@ -51,6 +43,7 @@ public class MainClient {
 	public MainClient(ModelDAO xmlHandler,GUIWindow window){
 				
 		window.addController(this);
+		this.window = window;
 		this.xmlHandler = xmlHandler;
 		
 		try {
@@ -177,34 +170,10 @@ public class MainClient {
 	 */
 	public void sendFile(DataObject dataObj, File fileToSend){
 		
-		
 			System.out.println("envoie d'un fichier");
-		
-			
+			dataObj.setServer(fileServerInfo[0]);
+			dataObj.setPort(Integer.parseInt(fileServerInfo[1]));
 			tunnelServeurFichier.sendFile( dataObj, fileToSend);
-			//alert server that a file is comming
-//			oos.writeObject("file");
-		
-			///XXX DUMMY dataObject and file
-			//DataObject dataOb =new DataObject(0,"Desert.jpg","0",0,"0","root/folder1/","Mathieu","");
-			//File f = new File("C:\\Users\\Public\\Pictures\\Sample Pictures\\Desert.jpg");
-			
-			
-			//serialise and send dataObject( object that represent the file ) 
-//			oos.writeObject(xmlParser.ObjectToXMLString(dataObj));
-			
-			//get the file Byte
-//			byte[] content = Files.readAllBytes(fileToSend.toPath());
-			
-			//send the file
-//			oos.writeObject(content);
-//			System.out.println("envoie reussi");
-			
-			//say close to server
-//			System.out.println("close");
-//			oos.writeObject("close");
-			
-
 	}
 	
 
@@ -224,6 +193,18 @@ public class MainClient {
 		}
 
 		
+	}
+
+	public void sendXMLModification(String repoPath, String name, String action) {
+		tunnelServeurFichier.sendXMLModification(repoPath, name, action);
+	}
+	
+	public void sendXMLModification(DataObject dataObject) {
+		tunnelServeurFichier.sendXMLModification(dataObject);
+	}
+
+	public void refresh(){
+		window.refreshTree();
 	}
 	
 }
