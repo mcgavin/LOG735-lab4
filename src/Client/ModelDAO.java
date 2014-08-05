@@ -1,8 +1,6 @@
 package Client;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -25,58 +23,30 @@ import org.xml.sax.SAXException;
 import Client.DataObject;
 
 public class ModelDAO {
-	
+
 	private Document doc;
-	DocumentBuilder docBuilder;
-	private String folder = "Client";
-	private String file = "metadata.xml";
 	private String filepath = "Client/metadata.xml";
-	
+
 	public ModelDAO() {
 		try {
-			
-			
+
+
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory
 					.newInstance();
-		
-			File theDir = new File(folder);
-			File theFile = new File(filepath);
-			// if the directory does not exist, create it
-			if (!theDir.exists()) {
-				
-				boolean result = false;
-				
-				try{
-					result = theDir.mkdirs();
-					
-				} catch(SecurityException se){
-					   System.err.println("Cannot create the directory");
-				}        
-				if(result) {    
-					System.out.println("created directory: " +folder);
-				}
-			}
-		
-			if(!theFile.exists()){
-				theFile.createNewFile();
-				System.out.println("filecreated");
-			}
-			FileWriter fout = new FileWriter(theFile);
-			fout.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><filesystem></filesystem>");
-			fout.close();
-			
+			DocumentBuilder docBuilder;
+
 			docBuilder = docFactory.newDocumentBuilder();
 			doc = docBuilder.parse(filepath);
-			
+
 		} catch (ParserConfigurationException | SAXException | IOException e) {
-			
+
 			System.err.println("Failed to parse "+filepath);
 			//e.printStackTrace();
 		}
-		
+
 	}
-	
-	
+
+
 	public void AddNewFile(DataObject dataObject) {
 		try {
 
@@ -206,7 +176,7 @@ public class ModelDAO {
 			System.err.println("File does not exist.");
 		}
 	}
-	
+
 	public void AddRepo(String repo, String name) {
 		try {
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory
@@ -242,7 +212,7 @@ public class ModelDAO {
 			sae.printStackTrace();
 		}
 	}
-	
+
 	public void DeleteRepo(String repo) {
 		try {
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory
@@ -284,12 +254,12 @@ public class ModelDAO {
 			System.err.println("Repo does not exist.");
 		}
 	}
-	
+
 	public DefaultMutableTreeNode loadAllXmlIntoTree() {
 		DefaultMutableTreeNode top = null;
 		DefaultMutableTreeNode completedTree = null;
 		try {
-			
+
 			//Reload doc for refresh
 			File fXmlFile = new File(filepath);
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory
@@ -345,7 +315,7 @@ public class ModelDAO {
 				DefaultMutableTreeNode item = new DefaultMutableTreeNode(
 						node.getNodeName());
 				for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-					// not a file ? make it a repo in jTREE					
+					// not a file ? make it a repo in jTREE
 					parcourir(node.getChildNodes().item(i), item);
 				}
 				top.add(item);
