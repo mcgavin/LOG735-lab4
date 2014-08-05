@@ -24,8 +24,6 @@ import javax.swing.JTree;
 import javax.swing.UIManager;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -61,19 +59,19 @@ public class GUIWindow {
 	/**
 	 * Launch the application.
 	 */
-//	public static void main(String[] args) {
-//		
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					GUIWindow window = new GUIWindow();
-//					window.frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
+	public static void main(String[] args) {
+		
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					GUIWindow window = new GUIWindow();
+					window.frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
 
 	/**
 	 * remain compatible to main statis method
@@ -273,22 +271,10 @@ public class GUIWindow {
 		mnFile.add(mntmExit);
 	}
 
-	
-	
-	
-    protected DefaultTreeModel treeModel;
-	
-	
 	private void updateTree(){
 		// Load all the tree when 1rst time opening
-		
-		treeModel = new DefaultTreeModel(model.loadAllXmlIntoTree());
-		treeModel.addTreeModelListener(new MyTreeModelListener());
-		fileTree = new JTree(treeModel);
-		
-//		DefaultMutableTreeNode top = model.loadAllXmlIntoTree();
-//		fileTree = new JTree(top);
-//		
+		DefaultMutableTreeNode top = model.loadAllXmlIntoTree();
+		fileTree = new JTree(top);
 		fileTree.setCellRenderer(new MyTreeCellRenderer());
 
 		for (int i = 0; i < fileTree.getRowCount(); i++) {
@@ -349,39 +335,5 @@ public class GUIWindow {
 		
 		return this.frame;
 	}
-	
-	//code from http://docs.oracle.com/javase/tutorial/uiswing/components/tree.html#dynamic
-	
-	class MyTreeModelListener implements TreeModelListener {
-	    public void treeNodesChanged(TreeModelEvent e) {
-	        DefaultMutableTreeNode node;
-	        node = (DefaultMutableTreeNode)
-	                 (e.getTreePath().getLastPathComponent());
-
-	        /*
-	         * If the event lists children, then the changed
-	         * node is the child of the node we have already
-	         * gotten.  Otherwise, the changed node and the
-	         * specified node are the same.
-	         */
-	        try {
-	            int index = e.getChildIndices()[0];
-	            node = (DefaultMutableTreeNode)
-	                   (node.getChildAt(index));
-	        } catch (NullPointerException exc) {}
-
-	        System.out.println("The user has finished editing the node.");
-	        System.out.println("New value: " + node.getUserObject());
-	    }
-	    public void treeNodesInserted(TreeModelEvent e) {
-	    }
-	    public void treeNodesRemoved(TreeModelEvent e) {
-	    }
-	    public void treeStructureChanged(TreeModelEvent e) {
-	    }
-	}
-	
-	
-	
 	
 }
