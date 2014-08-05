@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 import XMLtool.UpdateMetadata;
@@ -119,8 +121,21 @@ class SocketListener extends Thread{
 						String[] s = eventString.split(":");
 						//s[1]= repoPath
 						tunnel.modifyXML(s[1], null, "deleteRepo");
+						
+					}else if(eventString.startsWith("sendMeXML")){
+						
+						tunnel.sendAllXML();
+						
+					}else if(eventString.startsWith("wholeXMl")){
+						byte[] content = (byte[]) ois.readObject();
+						Path p = Paths.get("metadata.xml");
+						
+						Files.delete(p);
+						
+						Files.write(Paths.get("metadata.xml"), content);
+
+						
 					}
-					
 				}
 				
 				

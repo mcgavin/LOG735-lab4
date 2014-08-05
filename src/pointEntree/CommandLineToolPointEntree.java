@@ -39,9 +39,15 @@ public class CommandLineToolPointEntree extends Thread {
 				if(commandArg[0].equals("print")){
 					if(commandArg[1].equals("servers")){
 						System.out.println(this.pointEntree.printAllServers());
+					}else if(commandArg[1].equals("info")){
+						System.out.println(this.pointEntree.printLocalInfo());
+					}else{
+						printHelp();
 					}
-				}else if(commandArg[0].equals("erreur")){
+
 					
+				}else if(commandArg[0].equals("help")){
+					printHelp();
 				}
 			
 			
@@ -52,17 +58,13 @@ public class CommandLineToolPointEntree extends Thread {
 	}
 	
 	public void printHelp(){
-		System.out.println("Commande de la Succursale\n" +
-				"~~ COMMANDE ~~\n"+
-				"chandy                     : Demarre chandy-lamport\n"+
-				"envoie %succ% %montant%    : envoie le %montant% a la succursale %succ% (entier )\n" +
-				"erreur %montant%           : introduit un erreur en enlevant le montant a la succursale\n"+
-				"\n"+
+		System.out.println("\n" +
 				"~~ INFORMATION ~~\n"+
-				"print help/aide            : print l'aide\n"+
-				"print ID/id                : print le Id de la succursale presente\n"+
-				"print montant/argent       : print l'argent succursale presente\n"+
-				"print list/tunnel          : print toute les connections vers les autres succursales\n" 
+				"print help          : print l'aide\n"+
+				"print servers       : print la liste des serveur\n"+
+//				"print clients       : print la liste de clients\n"+
+				"print info          : print les info du point\n"
+
 				);
 	}
 }

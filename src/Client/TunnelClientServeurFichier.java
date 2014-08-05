@@ -46,7 +46,8 @@ public class TunnelClientServeurFichier{
 		inputTread = new ClientSocketListener(clientSocket,this );
 		outputTread.start();
 		inputTread.start();
-			
+		
+		writeList.add("sendMeXML");
 	}
 	
 	/**
@@ -109,22 +110,26 @@ public class TunnelClientServeurFichier{
 
 	public void modifyXML(String repoPath, String name, String action) {
 		if(action.equals("addRepo")){
-			mainClient.xmlHandler.AddRepo(repoPath, name);
+			mainClient.getXmlHandler().AddRepo(repoPath, name);
 			mainClient.refresh();
 		} else{
-			mainClient.xmlHandler.DeleteRepo(repoPath);
+			mainClient.getXmlHandler().DeleteRepo(repoPath);
 			mainClient.refresh();
 		}
 	}
 	public void modifyXML(DataObject dataObject, String action){
 		if(action.equals("addFile")){
-			mainClient.xmlHandler.AddNewFile(dataObject);
+			mainClient.getXmlHandler().AddNewFile(dataObject);
 			mainClient.refresh();
 		} else{
-			mainClient.xmlHandler.DeleteFile(dataObject);
+			mainClient.getXmlHandler().DeleteFile(dataObject);
 			mainClient.refresh();
 		}
 	}	
+	
+	public void updateClient(){
+		mainClient.refresh();
+	}
 	
 }
 

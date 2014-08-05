@@ -17,6 +17,7 @@ public class TunnelServeurFichier extends AbstractTunnel{
 	private SocketWriter outputTread;
 	private SocketListener inputTread;
 	
+	
 	//instancier a partire de 0
 	public TunnelServeurFichier(Socket clientSocket, ServeurFichier serveurFichierLocal){
 		
@@ -47,7 +48,9 @@ public class TunnelServeurFichier extends AbstractTunnel{
 	public void closeTunnel(){
 		outputTread.setRunning(false);
 		inputTread.setRunning(false);
+		super.setTunnelDown();
 		this.serveurFichierLocal.removeTunnelServeurFichierFromList(this);
+		
 	}
 	
 	public String toString(){

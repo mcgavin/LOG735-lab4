@@ -1,6 +1,7 @@
 package serveurDeFichier;
 
 import XMLtool.SyncedWriteList;
+import XMLtool.UpdateMetadata;
 import XMLtool.xmlParser;
 import Client.DataObject;
 
@@ -8,13 +9,26 @@ public abstract class AbstractTunnel {
 
 	protected SyncedWriteList writeList;
 	protected ServeurFichier serveurFichierLocal;
+	private boolean tunnelup;
+	
 	
 	public abstract void closeTunnel();
 	public abstract void sendFile(DataObject dataObj);
 	
+	
+	
 	public AbstractTunnel(){
 		writeList = new SyncedWriteList();
+		tunnelup = true;
 	}
+	public boolean isTunnelUp(){
+		return tunnelup;
+	}
+	
+	public void setTunnelDown(){
+		tunnelup = false;
+	}
+	
 	
 	//***********************************
 	//modify function goes   from socket to serveur ( UP) 
@@ -48,6 +62,11 @@ public abstract class AbstractTunnel {
 			writeList.add(action+":"+repoPath+":"+name);
 		}
 		
+	}
+	
+	public void sendAllXML() {
+		writeList.add("wholeXMl");
+		writeList.addObject(UpdateMetadata.getXMLFile());
 	}
 	
 }

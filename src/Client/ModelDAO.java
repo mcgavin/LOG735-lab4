@@ -1,6 +1,8 @@
 package Client;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -25,6 +27,9 @@ import Client.DataObject;
 public class ModelDAO {
 	
 	private Document doc;
+	DocumentBuilder docBuilder;
+	private String folder = "Client";
+	private String file = "metadata.xml";
 	private String filepath = "Client/metadata.xml";
 	
 	public ModelDAO() {
@@ -33,8 +38,33 @@ public class ModelDAO {
 			
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory
 					.newInstance();
-			DocumentBuilder docBuilder;
 		
+			File theDir = new File(folder);
+			File theFile = new File(filepath);
+			// if the directory does not exist, create it
+			if (!theDir.exists()) {
+				
+				boolean result = false;
+				
+				try{
+					result = theDir.mkdirs();
+					
+				} catch(SecurityException se){
+					   System.err.println("Cannot create the directory");
+				}        
+				if(result) {    
+					System.out.println("created directory: " +folder);
+				}
+			}
+		
+			if(!theFile.exists()){
+				theFile.createNewFile();
+				System.out.println("filecreated");
+			}
+			FileWriter fout = new FileWriter(theFile);
+			fout.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><filesystem></filesystem>");
+			fout.close();
+			
 			docBuilder = docFactory.newDocumentBuilder();
 			doc = docBuilder.parse(filepath);
 			
@@ -260,11 +290,10 @@ public class ModelDAO {
 		DefaultMutableTreeNode completedTree = null;
 		try {
 
-//			File fXmlFile = new File("metadata.xml");
-//			DocumentBuilderFactory dbFactory = DocumentBuilderFactory
-//					.newInstance();
-//			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-//			Document doc = dBuilder.parse(fXmlFile);
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory
+					.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse(filepath);
 
 			doc.getDocumentElement().normalize();
 

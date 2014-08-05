@@ -44,6 +44,17 @@ class SocketWriter extends Thread{
 						oos.writeObject(string);
 						thingsToWrite.remove(0);
 						
+					}else if(string.startsWith("wholeXMl")){
+						oos.writeObject("wholeXMl");
+						thingsToWrite.remove(0);
+						System.out.println("sending whole XML");
+						Thread.sleep(1000);
+						//write the file
+						byte[] content  = ( byte[] )thingsToWrite.getNRemoveFirst();
+						oos.writeObject(content);
+						System.out.println("!!! SENT !!!");
+						
+						
 					}else{
 						oos.writeObject(string);
 						thingsToWrite.remove(0);

@@ -2,6 +2,7 @@ package XMLtool;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -312,4 +313,21 @@ public class UpdateMetadata {
 			System.err.println("Repo does not exist.");
 		}
 	}
+	
+	public static byte[] getXMLFile() {
+		
+		File f = new File("metadata.xml");
+		
+		byte[] content =null;
+		
+		try {
+			content = Files.readAllBytes(f.toPath());
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+		return content;
+		
+	}
+	
 }

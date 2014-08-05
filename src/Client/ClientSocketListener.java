@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import XMLtool.xmlParser;
 import Client.DataObject;
@@ -36,13 +38,6 @@ class ClientSocketListener extends Thread{
 		}
 	}
 	
-//	public SocketListener(ObjectInputStream objectInputStream,AbstractTunnel tunnel ){
-//		
-//			this.tunnel =  tunnel;
-//			
-//			ois = objectInputStream;
-//	}
-	
 	public void run() {
 		
 		//Ecoute et traite les evenements
@@ -70,6 +65,17 @@ class ClientSocketListener extends Thread{
 					DataObject dataobj = xmlParser.xmlStringToObject(s[1]);
 					tunnel.modifyXML(dataobj, "deleteFile");
 				}
+				else if(eventString.startsWith("wholeXMl")){
+					System.out.println("receiving new XML");
+					byte[] content = (byte[]) ois.readObject();
+					Path p = Paths.get("Client/metadata.xml");
+					
+					Files.delete(p);
+					
+					Files.write(Paths.get("Client/metadata.xml"), content);
+					tunnel.updateClient();
+					System.out.println("!!! OK !!!");
+				}
 				
 			} catch (IOException | ClassNotFoundException e) {	
 				
@@ -88,6 +94,7 @@ class ClientSocketListener extends Thread{
 			}
 
 		}
+		this.tunnel.close();
 		
 	}
 	public boolean isRunning() {

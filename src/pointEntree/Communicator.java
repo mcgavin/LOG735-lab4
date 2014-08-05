@@ -47,7 +47,7 @@ public class Communicator extends Thread {
 				//else if new ServeurFichier, send Liste ServeurFichier
 			
 			String typeConnection = (String) ois.readObject();
-			System.out.println("Nouvelle Connection : typeConnection = " +typeConnection);
+			System.out.println("Nouvelle Connection : " +typeConnection);
 			
 			
 			String[] typeConnectionsplit = typeConnection.split(":");
@@ -61,7 +61,7 @@ public class Communicator extends Thread {
 					oos.writeObject(this.pointEntree.getIteratorNext().toStringClient());
 				}else{
 					//for load balancing
-					System.out.println("Nouveau client ");
+					System.out.println("Nouveau client");
 					oos.writeObject(this.pointEntree.getIteratorNext().toStringClient());
 				}
 

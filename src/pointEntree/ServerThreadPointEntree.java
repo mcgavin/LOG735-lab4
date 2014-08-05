@@ -44,8 +44,6 @@ public class ServerThreadPointEntree extends Thread{
 				System.err.println("Erreur Connection Client "); 
 		    } 
 			
-//			pointEntree.addServeurFichier(new ServeurFichierInfo(clientSocket.getInetAddress().getHostAddress(), clientSocket.getPort()));
-			
 			Communicator communicator = new Communicator(clientSocket, pointEntree);
 			communicator.start();
 			

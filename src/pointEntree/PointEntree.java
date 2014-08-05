@@ -1,6 +1,8 @@
 package pointEntree;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,13 +12,15 @@ public class PointEntree {
 
 	private ServerThreadPointEntree serverThread;
 	private ArrayList<ServeurFichierInfo> listServeurFichier;
-//	private Iterator<ServeurFichierInfo> it;
+	private int port;
+//	private ArrayList<ServeurFichierInfo> listClient;
+
 	int it= Integer.MAX_VALUE;
 	
 	public static void main(String[] args) throws IOException {
 		
 		//default port
-		int port = 12045;
+		int port = 2025;
 		try{
 			if (args.length>0) {
 				port = Integer.parseInt(args[0]);
@@ -32,7 +36,7 @@ public class PointEntree {
 	}
 	
 	public PointEntree(int port) throws IOException{
-		
+		this.port = port;
 		CommandLineToolPointEntree cmd = new CommandLineToolPointEntree(this);
 		cmd.start();
 		
@@ -51,22 +55,22 @@ public class PointEntree {
 		return listServeurFichier;
 	}
 	
-	public String printAllServers() {
-		String out= "";
-		for (ServeurFichierInfo serveurFichierInfo : listServeurFichier) {
-			out += " "+ serveurFichierInfo+"\n";
-		}
-		return out;	
-	}
+
 	
 	public ServeurFichierInfo getIteratorNext(){
+		
+		//null object
+		ServeurFichierInfo serveurFichierInfo = new ServeurFichierInfo("",0,0);
+		
+		if (!listServeurFichier.isEmpty()){
 			if ( it < listServeurFichier.size()-1){
 				it++;
 			}else{ 
 				it = 0;
 			}
-
-		return listServeurFichier.get(it);
+			serveurFichierInfo = listServeurFichier.get(it);
+		}
+		return serveurFichierInfo;
 	}
 	
 	public void serverHS(String ipServer, String portClient){
@@ -87,4 +91,28 @@ public class PointEntree {
 			
 		}
 	}
+
+	public String printAllServers() {
+		String out= "";
+		for (ServeurFichierInfo serveurFichierInfo : listServeurFichier) {
+			out += ""+ serveurFichierInfo+"\n";
+		}
+		return out;	
+	}
+	
+	
+	public String printLocalInfo() {
+		
+		String s ="";
+		
+		try {
+			s += InetAddress.getLocalHost().getHostName()+":"+ port +"\n";
+			
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+				
+		return s;
+	}
+	
 }

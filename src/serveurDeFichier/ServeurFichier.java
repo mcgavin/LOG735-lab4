@@ -9,13 +9,10 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 import XMLtool.UpdateMetadata;
 import Client.DataObject;
-import pointEntree.ServeurFichierInfo;
 
 public class ServeurFichier {
 
@@ -41,22 +38,43 @@ public class ServeurFichier {
 	//***********************
 	// MAIN
 	
+	
+	/**
+	 * execute with
+	 * 
+	 * ServeurFichier ipPointEntrer portPointEntre portClient portServeur 
+	 * 
+	 * @param args
+	 * @throws IOException
+	 */
 	public static void main(String[] args) throws IOException {
 		System.out.println("**** Serveur de Fichier ****");
 		
+		
 		//default port
 		int pointEntreePort = 12045;
+		int portClient = 2015;
+		int portServeur = (int) (7000 + (Math.random()* (10000-7000)));
 		String pointEntreeIp = "127.0.0.1";
+		
 		try{
-			if (args.length==1) {
+			
+//			System.out.println("nb ARG = " +args.length);
+			if (args.length==2) {
 				pointEntreeIp = args[0];
 				pointEntreePort = Integer.parseInt(args[1]);
+				
+			}else if (args.length==4) {
+				pointEntreeIp = args[0];
+				pointEntreePort = Integer.parseInt(args[1]);
+				portClient = Integer.parseInt(args[2]);
+				portServeur = Integer.parseInt(args[3]);
 			}
 		}catch (NumberFormatException e) {
 			System.err.println("port Invalide");
 		}
 		
-		new ServeurFichier(pointEntreeIp , pointEntreePort);
+		new ServeurFichier(pointEntreeIp , pointEntreePort,portClient,portServeur);
 	}
 	
 	
@@ -66,15 +84,7 @@ public class ServeurFichier {
 	 * @param pointEntreeIP   : ip du point d<entrer du systeme de fichier
 	 * @param pointEntreePort : port de connectino du point d<entrer du systeme de fichier
 	 */
-	public ServeurFichier(String pointEntreeIP, int pointEntreePort) {
-		
-		//default
-		//pointEntreeIP = "127.0.0.1";
-		//pointEntreePort = 12045;
-		
-		//outils de ligne de commande
-		CommandLineTool cmd = new CommandLineTool(this);
-		cmd.start();
+	public ServeurFichier(String pointEntreeIP, int pointEntreePort, int portClient , int portServeur) {
 		
 
 		listTunnelServeurFichier = new ArrayList<TunnelServeurFichier>();
@@ -82,6 +92,8 @@ public class ServeurFichier {
 		
 		try {
 			serverFichierIP = InetAddress.getLocalHost().getHostAddress();
+			this.portClient =portClient;
+			this.portServeur =portServeur;
 			servID = serverFichierIP.replace(".","");
 			
 		} catch (UnknownHostException e) {
@@ -91,8 +103,7 @@ public class ServeurFichier {
 		
 		//intervale random pour port entre 5000 et 10000
 //		this.portClient = (int) (5000 + (Math.random()* (7000-5000)));
-		this.portClient = 2015;
-		this.portServeur = (int) (7000 + (Math.random()* (10000-7000)));
+
 		
 		
 		System.out.println("Ecoute pour Client au port  : "+ portClient);
@@ -101,36 +112,9 @@ public class ServeurFichier {
 		
 		
 		try {
-			Socket s = new Socket(pointEntreeIP, pointEntreePort);
-
-			ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
-			ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
-
 			
-			//authentification
-			oos.writeObject("serveur:"+portClient+":"+portServeur);
-			
-			
-			//recoit la liste des serveurs a se connecter
-			String listServeurFichierInfo;
-			try {
-				
-				//READ FROM SOCKETS
-				listServeurFichierInfo = (String) ois.readObject();
-			
-				System.out.println("list serveur : "+listServeurFichierInfo);
-			
-				//se connecte au autre serveur de fichier
-				connectionAuPair(listServeurFichierInfo);
-			
-				printServerList();
-				
-			} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-			}
-	
-			s.close();
-			
+			//connection point entrer et au pair
+			connectionPointEntrer(pointEntreeIP,pointEntreePort);
 			
 			// SPAWN SERVER THREAD
 			
@@ -150,6 +134,43 @@ public class ServeurFichier {
 			//impossible de creer une classe
 			e.printStackTrace();
 		}
+		//outils de ligne de commande
+		CommandLineToolServeur cmd = new CommandLineToolServeur(this);
+		cmd.start();
+	}
+	
+	public void connectionPointEntrer(String pointEntreeIP, int pointEntreePort) throws UnknownHostException, IOException{
+		
+		Socket s = new Socket(pointEntreeIP, pointEntreePort);
+
+		ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
+		ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
+
+		
+		//authentification
+		oos.writeObject("serveur:"+portClient+":"+portServeur);
+		
+		
+		//recoit la liste des serveurs a se connecter
+		String listServeurFichierInfo = "";
+		try {
+			
+			//READ FROM SOCKETS
+			listServeurFichierInfo = (String) ois.readObject();
+		
+			System.out.println("list serveur : "+listServeurFichierInfo);
+		
+			//se connecte au autre serveur de fichier
+			connectionAuPair(listServeurFichierInfo);
+		
+			printServerList();
+			
+		} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+		}
+
+		s.close();
+
 	}
 	
 	
@@ -172,12 +193,18 @@ public class ServeurFichier {
 				System.out.println("connection a " + serveurFichierInfo);
 				
 				String[] serverInfo = serveurFichierInfo.split(":");
-				
+				boolean xmlAsked = false;
 				try{
 					TunnelServeurFichier tunnel = new TunnelServeurFichier(
 							new Socket(serverInfo[0], Integer.parseInt(serverInfo[1])),this);
 					
 					addTunnelServeurFichierToList(tunnel);
+					
+					//ask the xml to the first tunnel that is up
+					if(tunnel.isTunnelUp() && !xmlAsked){
+						tunnel.writeList.add("sendMeXML");
+						xmlAsked = true;
+					}
 					
 				}catch(IOException exception){
 					
@@ -396,6 +423,15 @@ public class ServeurFichier {
 		}
 		System.out.println(output);
 		return output;
+	}
+
+
+	public String printLocalInfo() {
+		String s ="";
+		
+		s += serverFichierIP+":"+ portClient +":"+ portServeur+"\n";
+				
+		return s;
 	}
 
 

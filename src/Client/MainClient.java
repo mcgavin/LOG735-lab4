@@ -5,21 +5,49 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class MainClient {
 
-	public static void main(String[] args) {
+	private GUIWindow window;
+	private ObjectOutputStream oos;
+	private ObjectInputStream ois;
+	private Socket socket;
+	//private String infoServer;
+	private String[] fileServerInfo;
+	private int nbfois=0;
+	private boolean isConnectedServeurFichier;
+	
+	private ModelDAO xmlHandler;
+	private TunnelClientServeurFichier tunnelServeurFichier;
+	
+	public static void main(final String[] args) {
 
-	//	new ClientTest();
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					
+					//default port
+					int pointEntreePort = 12045;
+					String pointEntreeIp = "127.0.0.1";
+					try{
+						System.out.println(args.length);
+						if (args.length==2) {
+							pointEntreeIp = args[0];
+							pointEntreePort = Integer.parseInt(args[1]);
+						}else{
+							System.err.println("NO argument to connect to point entrer, taking default : "+pointEntreeIp+":"+pointEntreePort );
+						}
+					}catch (NumberFormatException e) {
+						System.err.println("port Invalide");
+					}
+					
+					
 					ModelDAO xmlHandler = new ModelDAO();
 					GUIWindow window = new GUIWindow(xmlHandler);
-					MainClient mainclient = new MainClient(xmlHandler,window );
+					MainClient mainclient = new MainClient(xmlHandler,window,pointEntreeIp,pointEntreePort );
 					
 					window.getFrame().setVisible(true);
 				} catch (Exception e) {
@@ -30,101 +58,82 @@ public class MainClient {
 		
 		
 	}
-	private GUIWindow window;
-	private ObjectOutputStream oos;
-	private ObjectInputStream ois;
-	private Socket socket;
-	private String infoServer;
-	private String[] fileServerInfo;
 	
-	ModelDAO xmlHandler;
-	TunnelClientServeurFichier tunnelServeurFichier;
-	
-	public MainClient(ModelDAO xmlHandler,GUIWindow window){
+	public MainClient(ModelDAO xmlHandler,GUIWindow window, String pointEntreeIp, int pointEntreePort){
 				
 		window.addController(this);
 		this.window = window;
-		this.xmlHandler = xmlHandler;
+		isConnectedServeurFichier = false;
+		
 		
 		try {
-			//connection au point d'entrer
-			connection("127.0.0.1", 12045);
-
-		} catch (IOException | ClassNotFoundException  e ){
-			
-			System.err.println("Incapable de se connecter au point d'entrer du systeme");
-			//System.out.println("Veuillez entrer utiliser l<utilitaire de ligne de connande pour vous connecter");
-			//TODO lauch commandLineTools and add a function thathelp connect directly to a file server
-			//e.printStackTrace();
-		}
+			while ((!isConnectedServeurFichier) && nbfois<3  ){
+				//connection au point d'entrer
+				
+				
+				fileServerInfo = connexionPointEntrer(pointEntreeIp, pointEntreePort, nbfois++);
 	
-		//instruction de connection au server de fichier
-		instruction();
+				isConnectedServeurFichier = connexionServeurFichier(fileServerInfo[0],Integer.parseInt(fileServerInfo[1]));
+				
+			}
 		
+		} catch (IOException | ClassNotFoundException e ){
+			
+			System.err.println("\nIncapable de se connecter au point d'entrer du systeme");
+			
+		}
+		
+		System.out.println("\n*****************************************************************************\n"
+						   + "** Veuillez utiliser l'utilitaire de ligne de commande pour vous connecter si vous n'etes pas connecte **"
+					      +"\n*****************************************************************************");
+		
+		CommandLineToolClient cmd = new CommandLineToolClient(this);
+		cmd.start();
 		
 	}
-
-	public void instruction(){
+	
+	/**
+	 * 
+	 * @param serveurIP
+	 * @param port : serveur port
+	 */
+	public boolean connexionServeurFichier(String serveurIP, int port){
+		
+//		boolean connectionSucceed = false;
 		
 		System.out.println("Connection au serveur de fichier");
 		
 		try{
 			
-			this.fileServerInfo = infoServer.split(":");
+//			this.fileServerInfo = infoServer.split(":");
 			
-			System.out.println("connection au serveur "+ infoServer);
-			socket = new Socket(fileServerInfo[0],Integer.parseInt(fileServerInfo[1]));
-			System.out.println("connection reussis");
+			System.out.println("connexion au serveur "+ serveurIP+":"+port);
+			socket = new Socket(serveurIP,port);
+			
+			isConnectedServeurFichier = true;
+			System.out.println("connexion reussis");
 			
 			tunnelServeurFichier = new TunnelClientServeurFichier(socket, this);
 			
-			
-//			oos = new ObjectOutputStream(socket.getOutputStream());
-//			ois = new ObjectInputStream(socket.getInputStream());
-			
-			
-			
-			
-			
-//			System.out.println("envoie d<un fichier");
-//			oos.writeObject("file");
-//			
-//			DataObject dataOb =new DataObject(0,"Desert.jpg","0",0,"0","root/folder1/","Mathieu","");
-//			
-//			oos.writeObject(xmlParser.ObjectToXMLString(dataOb));
-//			
-//			File f = new File("C:\\Users\\Public\\Pictures\\Sample Pictures\\Desert.jpg");
-//			byte[] content = Files.readAllBytes(f.toPath());
-//			oos.writeObject(content);
-//			System.out.println("envoie reussi");
-//			System.out.println("close");
-//			oos.writeObject("close");
-			
-			
 		} catch (IOException  e ) {
-			System.out.println("impossible de ce connecter au serveur : " + infoServer);
-			try {
-				reConnection();
-			}catch (ClassNotFoundException | IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			//e.printStackTrace();
+			System.err.println("Impossible de ce connecter au serveur : " + serveurIP+":"+port);
 		}
 		
+		return isConnectedServeurFichier;
 	}
 	
 	/**
-	 * Connection au point d,entrer
+	 * Connection au point d'entrer
 	 * @param pointEntrerIP
 	 * @param port
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
-	public void connection(String pointEntrerIP, int port) throws IOException, ClassNotFoundException{
+	@Deprecated
+	public String connexionPointEntrer(String pointEntrerIP, int port) throws IOException, ClassNotFoundException, UnknownHostException{
 		
 		//connection au point d'entrer
-		System.out.print("connection au point entrer : ");
+		System.out.print("connexion au point entrer : ");
 		
 		socket = new Socket(pointEntrerIP, port);
 		
@@ -137,31 +146,47 @@ public class MainClient {
 		oos.writeObject("client");
 		
 		//information du serveur de fichier a se connecter
-		this.infoServer = (String) ois.readObject();
+		String infoServer = (String) ois.readObject();
 		
 		//fermeture de la connection avec le point d'entrer
 		socket.close();
+		return infoServer;
 	}
 	
-	public void reConnection() throws UnknownHostException, IOException, ClassNotFoundException{
+
+	/**
+	 * 
+	 * @param pointEntrerIP
+	 * @param port
+	 * @param nbFois
+	 * @return
+	 * 
+	 * @throws UnknownHostException
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
+	public String[] connexionPointEntrer(String pointEntrerIP, int port,int nbFois) throws UnknownHostException, IOException, ClassNotFoundException{
 		
-		
-			socket = new Socket("127.0.0.1", 12045);
+			System.out.print("connexion au point entrer : ");
+			socket = new Socket(pointEntrerIP, port);
+			System.out.print(" ok \n");
 			
 			oos = new ObjectOutputStream(socket.getOutputStream());
 			ois = new ObjectInputStream(socket.getInputStream());
 			
-			System.out.println("re-connection au point entrer");
-			//String message = "client:" + infoServer;
-			oos.writeObject("client:" + infoServer);
+			if (nbFois>0){
+				oos.writeObject("client:" + fileServerInfo[0]+":"+fileServerInfo[1]);
+			}else{
+				oos.writeObject("client");
+			}
 			
-			infoServer = (String) ois.readObject();
+			String infoServer = (String) ois.readObject();
 			
-			System.out.println("connection au serveur "+ infoServer);
+			fileServerInfo = infoServer.split(":");
 
 			socket.close();
-			instruction();
 
+			return fileServerInfo;
 	}
 	
 	
@@ -206,5 +231,31 @@ public class MainClient {
 	public void refresh(){
 		window.refreshTree();
 	}
-	
+
+	public ModelDAO getXmlHandler() {
+		return xmlHandler;
+	}
+
+	public boolean isConnectedServeurFichier() {
+		return isConnectedServeurFichier;
+	}
+
+	public String printServeurInfo() {
+		
+		return fileServerInfo[0]+":"+fileServerInfo[1];
+	}
+
+	public String printLocalInfo() {
+		
+		String s ="";
+		
+		try {
+			s += InetAddress.getLocalHost().getHostAddress() +"\n";
+			
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+				
+		return s;
+	}
 }
