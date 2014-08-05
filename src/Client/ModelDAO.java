@@ -259,22 +259,23 @@ public class ModelDAO {
 		DefaultMutableTreeNode top = null;
 		DefaultMutableTreeNode completedTree = null;
 		try {
+			
+			//Reload doc for refresh
+			File fXmlFile = new File(filepath);
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory
+					.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document docum = dBuilder.parse(fXmlFile);
 
-//			File fXmlFile = new File("metadata.xml");
-//			DocumentBuilderFactory dbFactory = DocumentBuilderFactory
-//					.newInstance();
-//			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-//			Document doc = dBuilder.parse(fXmlFile);
-
-			doc.getDocumentElement().normalize();
+			docum.getDocumentElement().normalize();
 
 			System.out.println("Root element :"
-					+ doc.getDocumentElement().getNodeName());
+					+ docum.getDocumentElement().getNodeName());
 
-			top = new DefaultMutableTreeNode(doc.getFirstChild().getNodeName());
+			top = new DefaultMutableTreeNode(docum.getFirstChild().getNodeName());
 			DefaultMutableTreeNode start = new DefaultMutableTreeNode(
 					"Master Root");
-			completedTree = parcourir(doc.getFirstChild(), start);
+			completedTree = parcourir(docum.getFirstChild(), start);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

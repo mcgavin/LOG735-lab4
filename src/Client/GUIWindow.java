@@ -48,19 +48,19 @@ public class GUIWindow {
 	private JButton btnDownload;
 	private JButton btnDelete;
 	private JTree fileTree;
-	
-	//XMlHandler
+	private JScrollPane scrollpane;
+
+	// XMlHandler
 	private ModelDAO model;
-	
-	//use to send command
+
+	// use to send command
 	private MainClient clientController;
-	
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		
+
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -80,7 +80,7 @@ public class GUIWindow {
 	public GUIWindow() {
 		initialize();
 	}
-	
+
 	public GUIWindow(ModelDAO model) {
 		this.model = model;
 		initialize();
@@ -123,28 +123,11 @@ public class GUIWindow {
 			}
 		});
 
-		//
-		fileTree.addTreeExpansionListener(new TreeExpansionListener() {
-
-			@Override
-			public void treeCollapsed(TreeExpansionEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void treeExpanded(TreeExpansionEvent arg0) {
-				arg0.getPath();
-				arg0.getSource();
-			}
-
-		});
-
 		// put the JTree into a JScrollPane.
-		JScrollPane scrollpane = new JScrollPane();
-		scrollpane.getViewport().add(fileTree);
+		scrollpane = new JScrollPane();
+		scrollpane.getViewport().setView(fileTree);
 		listPanel.add(BorderLayout.CENTER, scrollpane);
-		
+
 		JPanel btnPanel = new JPanel();
 		btnPanel.setBounds(10, 391, 674, 49);
 		frame.getContentPane().add(btnPanel);
@@ -159,15 +142,18 @@ public class GUIWindow {
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
 				String name = JOptionPane.showInputDialog("Enter a name");
-				String repoPath = fileTree.getSelectionPath().toString().replace("[Master Root","").replace("]", "").replace(", ", "/");
-				
-				//APPELLE AU SERVEUR POUR FAIRE : UpdateMetadata.DeleteRepo(repoPath);
-				//METHODE BROADCOAST METADATA_CHANGE
+				String repoPath = fileTree.getSelectionPath().toString()
+						.replace("[Master Root", "").replace("]", "")
+						.replace(", ", "/");
+
+				// APPELLE AU SERVEUR POUR FAIRE :
+				// UpdateMetadata.DeleteRepo(repoPath);
+				// METHODE BROADCOAST METADATA_CHANGE
 				clientController.sendXMLModification(repoPath, name, "addRepo");
-				//For test local only:
-				//UpdateMetadata.DeleteRepo(repoPath);
+				// For test local only:
+				// UpdateMetadata.DeleteRepo(repoPath);
 			}
-			
+
 		});
 
 		btnDelRepo = new JButton("Delete Repository");
@@ -178,13 +164,17 @@ public class GUIWindow {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				String repoPath = fileTree.getSelectionPath().toString().replace("[Master Root","").replace("]", "").replace(", ", "/");
-				int selectedOption = JOptionPane.showConfirmDialog(null, 
-                        "Do you want to delete the repository and all it's content?", 
-                        "Choose", 
-                        JOptionPane.YES_NO_OPTION);
-				if(selectedOption == JOptionPane.YES_OPTION){
-					clientController.sendXMLModification(repoPath, null, "deleteRepo");
+				String repoPath = fileTree.getSelectionPath().toString()
+						.replace("[Master Root", "").replace("]", "")
+						.replace(", ", "/");
+				int selectedOption = JOptionPane
+						.showConfirmDialog(
+								null,
+								"Do you want to delete the repository and all it's content?",
+								"Choose", JOptionPane.YES_NO_OPTION);
+				if (selectedOption == JOptionPane.YES_OPTION) {
+					clientController.sendXMLModification(repoPath, null,
+							"deleteRepo");
 				}
 			}
 		});
@@ -194,35 +184,39 @@ public class GUIWindow {
 		btnPanel.add(btnUpload);
 		btnUpload.addActionListener(new ActionListener() {
 			JFileChooser _fileChooser = new JFileChooser();
+
 			@Override
 			public void actionPerformed(ActionEvent ae) {
-	            //... Open a file dialog.
-	            int retval = _fileChooser.showOpenDialog(frame);
-	            if (retval == JFileChooser.APPROVE_OPTION) {
-	                //... The user selected a file, get it, use it.
-	                File file = _fileChooser.getSelectedFile();
-	                
-	                String repoPath = fileTree.getSelectionPath().toString().replace("[Master Root","").replace("]", "").replace(", ", "/");
-	                
-	                //... Update user interface.
+				// ... Open a file dialog.
+				int retval = _fileChooser.showOpenDialog(frame);
+				if (retval == JFileChooser.APPROVE_OPTION) {
+					// ... The user selected a file, get it, use it.
+					File file = _fileChooser.getSelectedFile();
 
-	                DataObject dataObject = new DataObject();
-	                dataObject.setName(file.getName());
-	                dataObject.setOwner("Client");
-	                DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH-mm");
-	                Date date = new Date();
-	                dataObject.setLastUpdated(dateFormat.format(date));
-	                dataObject.setRepo(repoPath);
-	                //Id et relname fabriquer par serveur
-	                //On envoit le dataobject a moitier construit au serveur
-	                String dataObjectToSend = xmlParser.ObjectToXMLString(dataObject);
-	                
-	                
-	                //Send dataObjectToSend et le file au serveur
-	                clientController.sendFile(dataObject, file);
-	                
-	            }
-	        }
+					String repoPath = fileTree.getSelectionPath().toString()
+							.replace("[Master Root", "").replace("]", "")
+							.replace(", ", "/");
+
+					// ... Update user interface.
+
+					DataObject dataObject = new DataObject();
+					dataObject.setName(file.getName());
+					dataObject.setOwner("Client");
+					DateFormat dateFormat = new SimpleDateFormat(
+							"yyyy/MM/dd HH-mm");
+					Date date = new Date();
+					dataObject.setLastUpdated(dateFormat.format(date));
+					dataObject.setRepo(repoPath);
+					// Id et relname fabriquer par serveur
+					// On envoit le dataobject a moitier construit au serveur
+					String dataObjectToSend = xmlParser
+							.ObjectToXMLString(dataObject);
+
+					// Send dataObjectToSend et le file au serveur
+					clientController.sendFile(dataObject, file);
+
+				}
+			}
 		});
 
 		btnDownload = new JButton("Download");
@@ -233,11 +227,12 @@ public class GUIWindow {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				int nbObj = fileTree.getSelectionPath().getPath().length;
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode) fileTree.getSelectionPath().getPath()[nbObj-1];
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) fileTree
+						.getSelectionPath().getPath()[nbObj - 1];
 				DataObject dataObject = (DataObject) node.getUserObject();
 				clientController.downloadFile(dataObject);
 			}
-			
+
 		});
 
 		btnDelete = new JButton("Delete");
@@ -249,14 +244,15 @@ public class GUIWindow {
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
 				int nbObj = fileTree.getSelectionPath().getPath().length;
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode) fileTree.getSelectionPath().getPath()[nbObj-1];
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) fileTree
+						.getSelectionPath().getPath()[nbObj - 1];
 				DataObject dataObject = (DataObject) node.getUserObject();
-				//TODO ENVOYER DATAOBJECT AU SERVEUR AVEC L'ACTION DELETE
-				//Test local:
-				//UpdateMetadata.DeleteFile(dataObject);
+				// TODO ENVOYER DATAOBJECT AU SERVEUR AVEC L'ACTION DELETE
+				// Test local:
+				// UpdateMetadata.DeleteFile(dataObject);
 				clientController.sendXMLModification(dataObject);
 			}
-			
+
 		});
 
 		JMenuBar menuBar = new JMenuBar();
@@ -269,7 +265,7 @@ public class GUIWindow {
 		mnFile.add(mntmExit);
 	}
 
-	private void updateTree(){
+	private void updateTree() {
 		// Load all the tree when 1rst time opening
 		DefaultMutableTreeNode top = model.loadAllXmlIntoTree();
 		fileTree = new JTree(top);
@@ -279,16 +275,40 @@ public class GUIWindow {
 			fileTree.expandRow(i);
 		}
 	}
-	
-	public void refreshTree(){
+
+	public void refreshTree() {
 		DefaultMutableTreeNode top = model.loadAllXmlIntoTree();
 		fileTree = new JTree(top);
-		DefaultTreeModel dtmModel = (DefaultTreeModel)fileTree.getModel();
-		dtmModel.reload();
-		System.out.println("2234");
+		fileTree.setCellRenderer(new MyTreeCellRenderer());
+
+		for (int i = 0; i < fileTree.getRowCount(); i++) {
+			fileTree.expandRow(i);
+		}
+		// Selection event
+		fileTree.addTreeSelectionListener(new TreeSelectionListener() {
+			public void valueChanged(TreeSelectionEvent e) {
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) e
+						.getPath().getLastPathComponent();
+				System.out.println("You selected " + node);
+				if (node == null)
+					// Nothing is selected.
+					return;
+
+				Object nodeInfo = node.getUserObject();
+				if (node.getUserObject() instanceof DataObject) {
+					DataObject data = (DataObject) nodeInfo;
+					System.out.println(data.getName());
+					System.out.println(data.getId());
+				} else {
+					System.out.println("une repo");
+				}
+				GestionBouton(node);
+			}
+		});
+		scrollpane.getViewport().setView(fileTree);
 	}
-	
-	public void addController(MainClient clientController){
+
+	public void addController(MainClient clientController) {
 		this.clientController = clientController;
 	}
 
@@ -328,10 +348,10 @@ public class GUIWindow {
 			btnUpload.setEnabled(true);
 		}
 	}
-	
-	public JFrame getFrame(){
-		
+
+	public JFrame getFrame() {
+
 		return this.frame;
 	}
-	
+
 }
